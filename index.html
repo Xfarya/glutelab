@@ -1,0 +1,2273 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0,viewport-fit=cover"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+<meta name="apple-mobile-web-app-title" content="GluteLab"/>
+<title>GluteLab</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;700&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+<style>
+:root{
+  --bg:#F8F4EF; --card:#FFFFFF; --dark:#17110A; --warm:#8A7A6A;
+  --peach:#E2957F; --sage:#8BBAA8; --lav:#A89BC0; --sand:#C2B49E;
+  --teal:#7BB5C8; --gold:#C9A96E; --border:#E8E0D5;
+  --easy:#8BBAA8; --hard:#C9A96E; --fail:#E2957F;
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--dark);padding-bottom:120px;overflow-x:hidden}
+
+/* ── SCREENS ── */
+.screen{display:none}.screen.active{display:block}
+
+/* ── NAV ── */
+.bnav{position:fixed;bottom:0;left:0;right:0;background:var(--dark);display:flex;z-index:999;padding:8px 0 max(8px,env(safe-area-inset-bottom))}
+.nb{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;border:none;background:transparent;color:#4A3A2A;cursor:pointer;font-family:'DM Sans',sans-serif;padding:4px 0}
+.nb.on{color:var(--peach)}
+.nb-i{font-size:20px;line-height:1}
+.nb-l{font-size:9px;letter-spacing:.5px;text-transform:uppercase}
+
+/* ── HEADER ── */
+.hdr{background:var(--dark);padding:50px 20px 24px;position:relative;overflow:hidden}
+.hdr::before{content:'';position:absolute;top:-40px;right:-40px;width:180px;height:180px;border-radius:50%;background:rgba(226,149,127,.12);pointer-events:none}
+.hl{font-size:9px;letter-spacing:4px;color:var(--peach);text-transform:uppercase;margin-bottom:4px}
+.ht{font-family:'Cormorant Garamond',serif;font-size:27px;color:#F5EFE8;line-height:1.2}
+.hs{color:#5A4A3A;font-size:11px;margin-top:5px;font-style:italic}
+
+/* ── WEEK BAR ── */
+.wbar{display:flex;margin:12px 12px 0;background:var(--card);border-radius:12px;overflow:hidden;box-shadow:0 1px 8px rgba(23,17,10,.07)}
+.wb{flex:1;padding:10px 2px;border:none;background:transparent;font-size:10px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;cursor:pointer;color:var(--warm);font-family:'DM Sans',sans-serif}
+.wb.on{background:var(--dark);color:var(--peach);border-radius:10px}
+.wdesc{margin:5px 12px 0;background:var(--card);border-radius:9px;padding:7px 11px;font-size:10px;color:var(--warm);font-style:italic;text-align:center}
+
+/* ── DAY PILLS ── */
+.dscroll{overflow-x:auto;padding:11px 10px 0;scrollbar-width:none}
+.dscroll::-webkit-scrollbar{display:none}
+.dpills{display:flex;gap:6px;width:max-content;padding-bottom:2px}
+.dp{padding:7px 14px;border-radius:100px;border:1.5px solid var(--border);background:transparent;font-size:10px;font-family:'DM Sans',sans-serif;color:var(--warm);cursor:pointer;white-space:nowrap;font-weight:700;letter-spacing:.3px}
+.dp.on{border:none;color:var(--dark);font-weight:800}
+
+/* ── MODE TOGGLE ── */
+.mtog{display:flex;margin:9px 12px 0;background:var(--card);border-radius:11px;overflow:hidden;box-shadow:0 1px 6px rgba(23,17,10,.05)}
+.mt{flex:1;padding:9px;border:none;background:transparent;font-size:11px;font-family:'DM Sans',sans-serif;font-weight:600;cursor:pointer;color:var(--warm)}
+.mt.on{background:var(--dark);color:var(--peach);border-radius:9px}
+
+/* ── DAY LABEL ── */
+.dlabel{margin:9px 12px 0;padding:13px 14px;background:var(--card);border-radius:13px;display:flex;align-items:center;gap:11px;box-shadow:0 1px 8px rgba(23,17,10,.06)}
+.ddot{width:42px;height:42px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:800;flex-shrink:0;color:var(--dark);text-transform:uppercase;letter-spacing:.5px}
+.dtag{font-size:9px;letter-spacing:2.5px;text-transform:uppercase;margin-bottom:2px}
+.dname{font-family:'Cormorant Garamond',serif;font-weight:700;font-size:16px;line-height:1.2}
+.dfoc{font-size:10px;color:var(--warm);margin-top:2px;font-style:italic;line-height:1.3}
+.chips{display:flex;flex-wrap:wrap;gap:3px;margin-top:5px}
+.chip{font-size:9px;font-weight:700;padding:2px 6px;border-radius:100px}
+
+/* ── STEPS ── */
+.scard{margin:9px 12px 0;background:var(--card);border-radius:13px;padding:11px 13px;box-shadow:0 1px 8px rgba(23,17,10,.05);display:flex;align-items:center;gap:10px}
+.sinp{width:95px;padding:5px 8px;border-radius:8px;border:1.5px solid var(--border);font-size:13px;font-family:'DM Sans',sans-serif;font-weight:700;background:var(--bg);outline:none;color:var(--dark)}
+.sinp:focus{border-color:var(--peach)}
+.sbar{background:var(--border);border-radius:100px;height:4px;margin-top:4px}
+.sbpb{height:4px;border-radius:100px;background:var(--sage);max-width:100%;transition:width .3s}
+
+/* ── PROGRESS BAR ── */
+.pbwrap{background:var(--border);border-radius:100px;height:4px;margin:9px 12px 0}
+.pb{height:4px;border-radius:100px;background:var(--peach);transition:width .4s}
+.pbtxt{text-align:right;font-size:10px;color:var(--warm);padding:3px 12px 0}
+
+/* ── EXERCISE CARDS ── */
+.esec{padding:7px 12px 0}
+.ecard{background:var(--card);border-radius:13px;margin-bottom:7px;overflow:hidden;box-shadow:0 1px 8px rgba(23,17,10,.05)}
+.phdr{padding:12px 14px;display:flex;justify-content:space-between;align-items:center;cursor:pointer;user-select:none}
+.ptitle{font-weight:700;font-size:12px}
+.ptog{font-size:18px;color:var(--peach);font-weight:300;line-height:1}
+.pbdy{border-top:1px solid var(--border)}
+
+/* ── EXERCISE ROW ── */
+.exrow{padding:11px 14px;border-bottom:1px solid var(--border)}
+.exrow:last-child{border-bottom:none}
+.extop{display:flex;align-items:flex-start;gap:9px}
+.exck{width:20px;height:20px;border-radius:5px;border:2px solid var(--border);background:white;cursor:pointer;flex-shrink:0;margin-top:2px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:white;transition:all .15s}
+.exck.on{background:var(--peach);border-color:var(--peach)}
+.exinf{flex:1;min-width:0}
+.exnm{font-weight:700;font-size:13px;line-height:1.3}
+.exnm.done{text-decoration:line-through;color:var(--warm)}
+.badge{font-size:10px;font-weight:700;padding:2px 8px;border-radius:100px;margin-top:3px;display:inline-block}
+.exnt{font-size:11px;color:var(--warm);font-style:italic;margin-top:3px;line-height:1.45}
+.prev{font-size:10px;color:var(--lav);margin-top:4px;background:#A89BC011;padding:3px 8px;border-radius:6px;display:inline-block}
+
+/* ── SET ROWS ── */
+.sets-wrap{margin-top:9px}
+.set-lbl{font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--warm);margin-bottom:5px}
+.set-row{display:flex;align-items:center;gap:4px;margin-bottom:4px}
+.snum{width:20px;height:20px;border-radius:5px;background:var(--border);display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;color:var(--warm);flex-shrink:0}
+.snum.on{background:var(--peach);color:white}
+.inp{padding:5px 6px;border-radius:7px;border:1.5px solid var(--border);font-size:12px;font-family:'DM Sans',sans-serif;background:var(--bg);outline:none;color:var(--dark);text-align:center}
+.inp:focus{border-color:var(--peach)}
+.inp-w{width:58px}
+.inp-r{width:46px}
+.dbtn{padding:4px 7px;border-radius:6px;border:1.5px solid var(--border);background:white;font-size:10px;cursor:pointer;font-family:'DM Sans',sans-serif;white-space:nowrap;transition:all .12s;line-height:1.3}
+.dbtn.easy{background:#8BBAA822;border-color:var(--easy);color:var(--easy);font-weight:700}
+.dbtn.hard{background:#C9A96E22;border-color:var(--hard);color:var(--hard);font-weight:700}
+.dbtn.fail{background:#E2957F22;border-color:var(--fail);color:var(--fail);font-weight:700}
+.addset{display:flex;align-items:center;justify-content:center;gap:4px;background:none;border:1.5px dashed var(--border);border-radius:7px;padding:5px 10px;font-size:11px;color:var(--warm);cursor:pointer;font-family:'DM Sans',sans-serif;margin-top:3px;width:100%}
+
+/* ── MEALS ── */
+.mcrd{background:var(--card);border-radius:13px;margin-bottom:7px;padding:13px;box-shadow:0 1px 8px rgba(23,17,10,.05)}
+.mh3{font-size:13px;font-weight:700;margin-bottom:8px;display:flex;align-items:center;gap:5px}
+.mta{width:100%;padding:8px;border-radius:8px;border:1.5px solid var(--border);font-family:'DM Sans',sans-serif;font-size:12px;color:var(--dark);background:var(--bg);resize:none;outline:none;min-height:62px;line-height:1.5}
+.mta:focus{border-color:var(--peach)}
+.mrow{display:flex;gap:5px;margin-top:6px}
+.mwrap{flex:1}
+.mlbl{font-size:9px;letter-spacing:1px;color:var(--warm);text-transform:uppercase;margin-bottom:3px}
+.minp{width:100%;padding:6px 5px;border-radius:7px;border:1.5px solid var(--border);font-size:12px;font-family:'DM Sans',sans-serif;text-align:center;background:var(--bg);outline:none;color:var(--dark)}
+.minp:focus{border-color:var(--peach)}
+.wglass{width:32px;height:32px;border-radius:7px;border:2px solid var(--border);background:white;cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center;transition:all .12s;flex-shrink:0}
+.wglass.on{background:#A8C5E8;border-color:#7BAAD0}
+
+/* ── PROGRESS ── */
+.ptabs{display:flex;margin:12px 12px 0;background:var(--card);border-radius:12px;overflow:hidden;box-shadow:0 1px 8px rgba(23,17,10,.06)}
+.ptb{flex:1;padding:10px 2px;border:none;background:transparent;font-size:10px;font-weight:700;cursor:pointer;color:var(--warm);font-family:'DM Sans',sans-serif;letter-spacing:.3px}
+.ptb.on{background:var(--dark);color:var(--peach);border-radius:10px}
+.psec{display:none;padding:9px 12px 0}.psec.on{display:block}
+
+/* ── CHARTS ── */
+.ccrd{background:var(--card);border-radius:13px;padding:15px;margin-bottom:8px;box-shadow:0 1px 8px rgba(23,17,10,.05)}
+.ct{font-family:'Cormorant Garamond',serif;font-size:16px;font-weight:700;margin-bottom:2px}
+.cs{font-size:10px;color:var(--warm);margin-bottom:10px;font-style:italic}
+svg.ch{width:100%;overflow:visible}
+.empty{text-align:center;padding:28px 16px;color:var(--warm);font-size:12px;font-style:italic}
+.exsearch{width:100%;padding:9px 11px;border-radius:9px;border:1.5px solid var(--border);font-family:'DM Sans',sans-serif;font-size:13px;background:var(--bg);outline:none;color:var(--dark);margin-bottom:8px}
+.exsearch:focus{border-color:var(--peach)}
+.exitem{padding:10px 13px;background:var(--card);border-radius:11px;cursor:pointer;border:1.5px solid var(--border);margin-bottom:6px;box-shadow:0 1px 6px rgba(23,17,10,.04)}
+.exitem-n{font-weight:700;font-size:13px}
+.exitem-s{font-size:10px;color:var(--warm);margin-top:2px}
+.backbtn{display:flex;align-items:center;gap:5px;background:none;border:none;font-family:'DM Sans',sans-serif;font-size:12px;color:var(--warm);cursor:pointer;margin-bottom:9px;padding:2px 0}
+.spills{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:10px}
+.spill{padding:6px 11px;border-radius:100px;border:1.5px solid var(--border);background:white;font-size:11px;font-weight:700;cursor:pointer;color:var(--warm);font-family:'DM Sans',sans-serif}
+.spill.on{background:var(--dark);color:var(--peach);border:none}
+.sethrow{display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:1px solid var(--border)}
+.sethrow:last-child{border-bottom:none}
+
+/* ── BODY STATS FORM ── */
+.bmc{background:var(--card);border-radius:13px;padding:14px;margin-bottom:8px;box-shadow:0 1px 8px rgba(23,17,10,.05)}
+.brow{display:flex;gap:7px;margin-bottom:7px;align-items:center}
+.blbl{font-size:11px;color:var(--warm);width:60px;flex-shrink:0}
+.binp{flex:1;padding:7px 8px;border-radius:8px;border:1.5px solid var(--border);font-family:'DM Sans',sans-serif;font-size:13px;background:var(--bg);outline:none;color:var(--dark)}
+.binp:focus{border-color:var(--peach)}
+.savebtn{width:100%;padding:11px;border-radius:10px;border:none;background:var(--peach);color:var(--dark);font-family:'DM Sans',sans-serif;font-size:13px;font-weight:700;cursor:pointer;margin-top:3px}
+.savebtn:active{opacity:.8}
+
+/* ── CYCLE MODAL ── */
+.modal-bg{position:fixed;inset:0;background:rgba(23,17,10,.75);z-index:2000;display:flex;align-items:flex-end;justify-content:center;animation:fadein .2s}
+@keyframes fadein{from{opacity:0}to{opacity:1}}
+.modal{background:var(--bg);border-radius:24px 24px 0 0;padding:28px 20px max(28px,env(safe-area-inset-bottom));width:100%;max-width:500px;max-height:88vh;overflow-y:auto;animation:slideup .25s cubic-bezier(.22,1,.36,1)}
+@keyframes slideup{from{transform:translateY(100%)}to{transform:translateY(0)}}
+.modal-drag{width:40px;height:4px;background:var(--border);border-radius:100px;margin:0 auto 20px}
+.modal-hl{font-size:9px;letter-spacing:4px;color:var(--peach);text-transform:uppercase;margin-bottom:6px}
+.modal-title{font-family:'Cormorant Garamond',serif;font-size:30px;line-height:1.15;margin-bottom:4px}
+.modal-sub{font-size:12px;color:var(--warm);font-style:italic;margin-bottom:20px}
+.cycle-stat-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:18px}
+.cycle-stat{background:var(--card);border-radius:12px;padding:13px 10px;text-align:center;box-shadow:0 1px 6px rgba(23,17,10,.06)}
+.cycle-stat-n{font-family:'Cormorant Garamond',serif;font-size:28px;line-height:1}
+.cycle-stat-l{font-size:9px;color:var(--warm);letter-spacing:1px;text-transform:uppercase;margin-top:2px}
+.pr-row{display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:1px solid var(--border)}
+.pr-row:last-child{border-bottom:none}
+.modal-btn{width:100%;padding:15px;border-radius:14px;border:none;font-family:'DM Sans',sans-serif;font-size:14px;font-weight:700;cursor:pointer;margin-top:8px;letter-spacing:.3px}
+.modal-btn-primary{background:var(--peach);color:var(--dark)}
+.modal-btn-secondary{background:var(--card);color:var(--warm);border:1.5px solid var(--border)}
+.modal-btn:active{opacity:.85}
+.cycle-badge{display:inline-flex;align-items:center;gap:5px;background:var(--dark);color:var(--peach);font-size:10px;font-weight:700;padding:4px 10px;border-radius:100px;letter-spacing:.5px;margin:10px 12px 0}
+.measure-form{background:var(--card);border-radius:14px;padding:14px;margin-bottom:10px}
+.measure-form-title{font-size:12px;font-weight:700;margin-bottom:10px;color:var(--dark)}
+
+/* ── EXPORT TAB ── */
+.exp-step{background:var(--card);border-radius:13px;padding:15px;margin-bottom:8px;box-shadow:0 1px 8px rgba(23,17,10,.05)}
+.exp-step-num{width:24px;height:24px;border-radius:50%;background:var(--peach);color:var(--dark);font-size:11px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.exp-step-title{font-weight:700;font-size:13px}
+.exp-step-body{font-size:11px;color:var(--warm);line-height:1.6;margin-top:5px}
+.exp-url-input{width:100%;padding:9px 11px;border-radius:9px;border:1.5px solid var(--border);font-family:'DM Sans',sans-serif;font-size:12px;background:var(--bg);outline:none;color:var(--dark);margin-top:8px;word-break:break-all}
+.exp-url-input:focus{border-color:var(--peach)}
+.exp-btn{width:100%;padding:13px;border-radius:11px;border:none;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:700;cursor:pointer;margin-top:6px;letter-spacing:.3px;transition:opacity .2s}
+.exp-btn:active{opacity:.8}
+.exp-btn-go{background:var(--peach);color:var(--dark)}
+.exp-btn-csv{background:var(--card);color:var(--dark);border:1.5px solid var(--border)}
+.exp-status{border-radius:9px;padding:10px 12px;font-size:12px;margin-top:8px;text-align:center;font-weight:600;display:none}
+.exp-status.ok{background:#8BBAA822;color:#5A9A88;display:block}
+.exp-status.err{background:#E2957F22;color:#C07060;display:block}
+.exp-status.loading{background:var(--border);color:var(--warm);display:block}
+.code-block{background:#17110A;border-radius:10px;padding:12px;font-size:10px;color:#8BBAA8;font-family:monospace;line-height:1.6;overflow-x:auto;margin-top:8px;white-space:pre}
+
+/* ── SETTINGS ── */
+.stg-section{margin-bottom:18px}
+.stg-section-title{font-size:9px;letter-spacing:3px;text-transform:uppercase;color:var(--warm);margin-bottom:8px;padding:0 2px}
+.stg-card{background:var(--card);border-radius:13px;padding:15px;box-shadow:0 1px 8px rgba(23,17,10,.05);margin-bottom:8px}
+.stg-card h3{font-size:13px;font-weight:700;margin-bottom:4px;display:flex;align-items:center;gap:6px}
+.stg-card p{font-size:11px;color:var(--warm);line-height:1.6;margin-bottom:10px}
+.url-input{width:100%;padding:9px 11px;border-radius:9px;border:1.5px solid var(--border);font-family:'DM Sans',sans-serif;font-size:12px;background:var(--bg);outline:none;color:var(--dark);margin-bottom:8px}
+.url-input:focus{border-color:var(--peach)}
+.sync-btn{width:100%;padding:13px;border-radius:11px;border:none;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:700;cursor:pointer;transition:all .2s;letter-spacing:.3px}
+.sync-btn-go{background:var(--peach);color:var(--dark)}
+.sync-btn-go:active{opacity:.8}
+.sync-btn-go:disabled{background:var(--border);color:var(--warm);cursor:default}
+.sync-status{text-align:center;font-size:11px;margin-top:6px;min-height:16px;font-style:italic}
+.sync-ok{color:var(--sage)}.sync-err{color:var(--fail)}.sync-loading{color:var(--warm)}
+.code-block{background:#17110A;border-radius:10px;padding:12px;font-family:monospace;font-size:10px;color:#8BBAA8;line-height:1.6;overflow-x:auto;white-space:pre;margin-bottom:8px;max-height:200px;overflow-y:auto}
+.copy-btn{width:100%;padding:9px;border-radius:9px;border:1.5px solid var(--border);background:white;font-family:'DM Sans',sans-serif;font-size:12px;font-weight:600;cursor:pointer;color:var(--dark);transition:all .15s}
+.copy-btn:active{background:var(--border)}
+.step-list{list-style:none;counter-reset:steps}
+.step-list li{counter-increment:steps;display:flex;gap:10px;padding:7px 0;border-bottom:1px solid var(--border);font-size:12px;line-height:1.5;color:var(--dark)}
+.step-list li:last-child{border-bottom:none}
+.step-list li::before{content:counter(steps);width:20px;height:20px;background:var(--peach);color:var(--dark);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;flex-shrink:0;margin-top:1px}
+
+/* ── STREAK CARD ── */
+.strcrd{background:var(--dark);border-radius:13px;padding:20px;text-align:center;margin-bottom:9px}
+.strn{font-family:'Cormorant Garamond',serif;font-size:50px;color:var(--peach);line-height:1}
+.wdots{display:flex;justify-content:center;gap:5px;margin-top:11px}
+.wdot{width:26px;height:26px;border-radius:50%;background:#252015;display:flex;align-items:center;justify-content:center;font-size:9px;color:#444;font-weight:700}
+.wdot.on{background:var(--peach);color:var(--dark)}
+.sgrid{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-bottom:9px}
+.scrd{background:var(--card);border-radius:13px;padding:14px;text-align:center;box-shadow:0 1px 8px rgba(23,17,10,.05)}
+.sn{font-family:'Cormorant Garamond',serif;font-size:30px;line-height:1}
+.sl{font-size:9px;color:var(--warm);letter-spacing:1px;text-transform:uppercase;margin-top:2px}
+</style>
+</head>
+<body>
+
+<!-- ══════════════ WORKOUT SCREEN ══════════════ -->
+<div id="sw" class="screen active">
+  <div class="hdr">
+    <div class="hl">GluteLab · 4-Week Programme</div>
+    <div class="ht">Your Complete<br>Transformation Plan</div>
+    <div class="hs">Glutes · Abs · Posture · Valgus · Calisthenics · Splits · Handstand</div>
+  </div>
+  <div class="wbar" id="wbar"></div>
+  <div id="cyclebadge"></div>
+  <div class="wdesc" id="wdesc"></div>
+  <div class="dscroll"><div class="dpills" id="dpills"></div></div>
+  <div id="mtog"></div>
+  <div id="dlabel"></div>
+  <div id="stepsc"></div>
+  <div class="pbwrap"><div class="pb" id="pb" style="width:0%"></div></div>
+  <div class="pbtxt" id="pbtxt"></div>
+  <div class="esec" id="esec"></div>
+</div>
+
+<!-- ══════════════ MEALS SCREEN ══════════════ -->
+<div id="sm" class="screen">
+  <div class="hdr">
+    <div class="hl">Nutrition</div>
+    <div class="ht">Daily Meals<br>&amp; Macros</div>
+    <div class="hs">Log food · track protein · hit your water</div>
+  </div>
+  <div style="padding:9px 12px 0" id="mealsec"></div>
+</div>
+
+<!-- ══════════════ PROGRESS SCREEN ══════════════ -->
+<div id="sp" class="screen">
+  <div class="hdr">
+    <div class="hl">Progress</div>
+    <div class="ht">Charts &amp;<br>Analytics</div>
+    <div class="hs">Every set tracked · every gain plotted</div>
+  </div>
+  <div class="ptabs">
+    <button class="ptb on" data-tab="exercises" onclick="showPTab(this)">📈 Lifts</button>
+    <button class="ptb" data-tab="body" onclick="showPTab(this)">📏 Body</button>
+    <button class="ptb" data-tab="overview" onclick="showPTab(this)">🏆 Overview</button>
+    <button class="ptb" data-tab="export" onclick="showPTab(this)">☁️ Export</button>
+  </div>
+  <div id="pt-exercises" class="psec on"></div>
+  <div id="pt-body" class="psec"></div>
+  <div id="pt-overview" class="psec"></div>
+  <div id="pt-export" class="psec"></div>
+</div>
+
+<!-- ══════════════ SETTINGS SCREEN ══════════════ -->
+<div id="ss" class="screen">
+  <div class="hdr">
+    <div class="hl">Settings</div>
+    <div class="ht">Google Sheets<br>Sync</div>
+    <div class="hs">Export all your data to a spreadsheet with one tap</div>
+  </div>
+  <div style="padding:12px 12px 0" id="settingssec"></div>
+</div>
+
+<!-- ══════════════ CYCLE MODAL ══════════════ -->
+<div id="cycle-modal" style="display:none"></div>
+
+<!-- ══════════════ NAV ══════════════ -->
+<div class="bnav">
+  <button class="nb on" id="nav-sw" onclick="showScreen('sw')"><span class="nb-i">🏋️</span><span class="nb-l">Workout</span></button>
+  <button class="nb" id="nav-sm" onclick="showScreen('sm')"><span class="nb-i">🥗</span><span class="nb-l">Meals</span></button>
+  <button class="nb" id="nav-sp" onclick="showScreen('sp')"><span class="nb-i">📈</span><span class="nb-l">Progress</span></button>
+  <button class="nb" id="nav-ss" onclick="showScreen('ss')"><span class="nb-i">⚙️</span><span class="nb-l">Sync</span></button>
+</div>
+
+<script>
+// ════════════════════════════════════════════════════
+// HELPERS
+// ════════════════════════════════════════════════════
+const $ = id => document.getElementById(id);
+const esc = s => String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+const slug = s => s.toLowerCase().replace(/[^a-z0-9]/g,'').substring(0,28);
+const today = new Date();
+const todayStr = today.toISOString().split('T')[0];
+
+function store(k,v){ try{ localStorage.setItem(k, typeof v==='string'?v:JSON.stringify(v)); }catch(e){} }
+function load(k,def=null){ try{ const v=localStorage.getItem(k); return v===null?def:JSON.parse(v); }catch(e){ return def; } }
+function loadStr(k,def=''){ try{ const v=localStorage.getItem(k); return v===null?def:v; }catch(e){ return def; } }
+
+// ════════════════════════════════════════════════════
+// GOAL CHIPS
+// ════════════════════════════════════════════════════
+const GOALS = {
+  glute: {c:'#E2957F', l:'🍑 Glutes'},
+  valgus:{c:'#7BB5C8', l:'🦵 Valgus'},
+  posture:{c:'#8BBAA8',l:'🧘 Posture'},
+  cali:  {c:'#A89BC0', l:'💪 Calisthenics'},
+  splits:{c:'#C9A96E', l:'🤸 Splits'},
+  hand:  {c:'#B8A0C8', l:'🙃 Handstand'},
+  abs:   {c:'#E2957F', l:'🎯 Abs'},
+};
+const chipHTML = keys => keys.map(k=>`<span class="chip" style="background:${GOALS[k].c}22;color:${GOALS[k].c}">${GOALS[k].l}</span>`).join('');
+
+// ════════════════════════════════════════════════════
+// WEEK META
+// ════════════════════════════════════════════════════
+const WEEKS = [
+  {l:'W1', d:'Foundation · 12–15 reps · build mind-muscle · learn movement patterns'},
+  {l:'W2', d:'Volume · add 2.5–5kg vs W1 · more sets · deepen stretches'},
+  {l:'W3', d:'Intensity · 6–8 reps HEAVY · hardest calisthenics · push limits'},
+  {l:'W4', d:'Deload + new stimulus · high rep / light · full recovery reset'},
+];
+
+// ════════════════════════════════════════════════════
+// PLAN  —  phases(w) returns array of phase objects for week w (0-3)
+// Every day has a phases() function that takes a week index
+// ════════════════════════════════════════════════════
+function ph(phase, goals, items){ return {phase, goals, items}; }
+function ex(name, sets, note, noSets=false){ return {name, sets, note, noSets}; }
+
+const PLAN = [
+
+// ─── MON: GLUTE A + VALGUS ───────────────────────────────────
+{ day:'Monday', label:'GLUTE A + VALGUS', tag:'Glute Day 1 · Hip Hinge', color:'#E2957F',
+  focus:'Hip hinge mass · VMO correction · APT fix', goals:['glute','valgus','posture'],
+  hasMT:false,
+  phases: w => [
+    ph('🔥 Activation + Valgus Fix',['glute','valgus'],[
+      ex('Banded Clamshells','3×15 each','Slow — isolate glute medius only, not hip flexor'),
+      ex('Terminal Knee Extension','3×15 each','ESSENTIAL for valgus. Band behind knee, drive knee back. VMO + glute med'),
+      ex(w<3?'Dead Bug':'Cat-Cow','3×10 each',w<3?'Lower back stays glued to floor — APT corrective':'W4 reset — reconnect with spinal movement'),
+    ]),
+    ph(w===2?'🍑 Hip Hinge — HEAVY (6–8)':w===3?'🍑 Hip Hinge — New Stimulus':'🍑 Hip Hinge — '+['Foundation','Volume'][Math.min(w,1)],['glute'],[
+      ex('Barbell Hip Thrust', w===0?'4×15':w===1?'5×12':w===2?'5×6':'3×12 tempo', w===0?'Moderate weight. Full ROM, 1-sec squeeze at top':w===1?'Add 5kg vs W1. Extra set for volume':w===2?'HEAVY — challenging by rep 6. Full lockout':' 3sec up, 1sec hold, 3sec down — time under tension'),
+      ...( w===0?[
+        ex('Romanian Deadlift','4×12','Feel hamstring stretch, drive hips forward. Bar close to legs'),
+        ex('Single Leg Glute Bridge','3×15 each','Reveals imbalances — knee tracks over second toe'),
+        ex('Cable Pull-Through','3×15','Hip hinge pattern — feel GLUTES not lower back'),
+      ]: w===1?[
+        ex('B-Stance Hip Thrust','3×12 each','Dominant leg does 70% of work — better isolation'),
+        ex('Romanian Deadlift','4×10','Heavier than W1. 1-sec pause at bottom stretch'),
+        ex('Glute-Focused Back Extension','3×15','Round lower back slightly — targets glutes not erectors'),
+        ex('Cable Pull-Through','4×12','Add weight. 3-sec slow eccentric'),
+      ]: w===2?[
+        ex('Trap Bar Deadlift','3×6','Heaviest compound. Glute + hamstring mass builder'),
+        ex('B-Stance Hip Thrust','4×8 each','Add weight from W2. Should burn hard by rep 6'),
+        ex('Romanian Deadlift','4×8','Heaviest yet. Bar very close to legs throughout'),
+      ]:[
+        ex('Romanian Deadlift','3×12','Light weight — deload. Focus on the stretch and feel entirely'),
+        ex('Kettlebell Swing','3×15','Explosive hip hinge — completely different stimulus'),
+        ex('Good Morning','3×15','Posterior chain — glute-ham tie-in'),
+        ex('Reverse Hyperextension','3×15','Lower glute + lower back health'),
+      ])
+    ]),
+    ...(w===2?[ph('🦵 Valgus — Loaded Pattern',['valgus'],[
+      ex('Banded Single Leg Squat to Box','3×8 each','Band above knee — push OUT while squatting. Loads the valgus correction'),
+      ex('Single Leg Calf Raise','2×15 each','Foot and ankle chain is base of valgus pyramid'),
+    ])]:[]),
+    ph('🧘 APT Fix — Every Session',['posture'],[
+      ex('Couch Stretch',w===3?'2 min each — LONGER this week':'2 min each','Non-negotiable every single session. #1 APT fix'),
+      ex(w>0?'90/90 Hip Stretch':'Kneeling Hip Flexor Stretch','90 sec each',w>0?'Opens hip ER and flexors simultaneously':'Tuck tailbone under as you lunge — feel anterior hip release'),
+      ...(w!==3?[]:[ex('Pigeon Pose','2 min each','Deep piriformis + external rotator release')]),
+    ]),
+  ],
+},
+
+// ─── TUE: PILATES / HOME ─────────────────────────────────────
+{ day:'Tuesday', label:'PILATES / HOME', tag:'Recovery + Core', color:'#8BBAA8',
+  focus:'APT correction · core · calisthenics foundation · splits', goals:['posture','cali','splits'],
+  hasMT:true,
+  phases: w => [
+    ph('🔥 Warm-Up',['posture'],[
+      ex('Cat-Cow','10 breaths','Slow — each inhale arches, each exhale rounds. Reconnect with your spine', true),
+      ex('Hip Circles Standing','10 each direction','Loosen the hip joint before class', true),
+      ex('Wrist Circles + Ankle Rolls','1 min','Joint prep for mat work', true),
+    ]),
+    ph('🧘 Pilates Mat — Core & APT',['posture','abs'],[
+      ex('Imprint and Release','2×10','Lie on back. Find neutral spine, then flatten to floor (posterior tilt). Practice this shape throughout the session', true),
+      ex('The Hundred','1 set',w===0?'Bent knees version — legs at tabletop. Pump arms, breathe 5 in / 5 out × 10 rounds':w===1?'Extend legs to 45° if core is strong enough. Maintain imprint throughout':w===2?'Legs lower than before (harder). Focus is keeping back flat':'Full version or bent knee depending on energy today — deload week', true),
+      ex('Single Leg Stretch','3×10 each','Alternate legs — one extends, one pulls in. Back stays imprinted throughout', true),
+      ex('Double Leg Stretch','3×10','Both legs and arms extend simultaneously. Back must stay flat — this is the hard part', true),
+      ex('Rolling Like a Ball','3×10','Round spine completely, balance on tailbone. Spinal massage + core control', true),
+      ex('Swan Prep','3×10','Lie on stomach, push chest up with hands. Opens anterior chain, counters APT curve', true),
+      ex('Child\'s Pose to Thread the Needle','5 each side','Child\'s pose → reach one arm under body for thoracic rotation. Opens chest = posture fix', true),
+    ]),
+    ph('🍑 Glute Activation (Pilates Style)',['glute','valgus'],[
+      ex('Side-Lying Clam','3×15 each','Keep hips stacked, don\'t roll back. Pure glute medius — valgus fix', true),
+      ex('Side-Lying Leg Lifts','3×12 each','Slow lift and lower. Tests hip abductor strength and control', true),
+      ex('Side Kick Series — Front/Back','3×10 each','Kick front (hip flexion), swing back (hip extension). Glute + hip flexor in opposition', true),
+      ex('Glute Bridge Pilates Style','3×15','Articulate the spine on the way up and down. Much more controlled than gym version — trains APT correction', true),
+      ex(w<2?'Single Leg Bridge':'Single Leg Bridge with Knee Extension','3×8 each','Advanced — reveals and corrects hip imbalances', true),
+    ]),
+    ph('💪 Calisthenics Foundation',['cali'],[
+      ex(w===0?'Incline Push-Up':w===1?'Full Push-Up':'Pike Push-Up','3×'+(w===0?'10':w===1?'12':'8'),''),
+      ex('Hollow Body Hold','3×'+(w===0?'15':w===1?'20':w===2?'25':'30')+' sec','Foundation of all calisthenics. Flat back, arms by ears, legs up together'),
+      ex(w===0?'Dead Hang':w===1?'Scapular Pull-Up':'Negative Pull-Up','3×'+(w===2?'3 slow':'20-25 sec'),''),
+    ]),
+    ph('🧘 APT + Splits Maintenance',['posture','splits'],[
+      ex('Couch Stretch','2 min each','Hip flexors — do this every single day', true),
+      ex('Low Lunge Hip Flexor Hold','90 sec each','Front splits prep', true),
+      ex('Butterfly Stretch','2 min','Adductors — middle splits prep. Lean forward and breathe', true),
+      ex('Supine Spinal Twist','90 sec each side','Release the lower back, open the chest. End every session with this', true),
+    ]),
+  ],
+  phasesHome: w => [
+    ph('🧘 Pilates Foundation — APT',['posture'],[
+      ex('Imprint and Release','2×10','Lie on back. Find neutral spine then flatten it — this IS posterior pelvic tilt. Practice it'),
+      ex('Dead Bug','3×10 each','Back stays flat throughout. Essential APT corrective'),
+      ex(w<2?'Single Leg Stretch':'Teaser Prep V-Sit Hold','3×10',w<2?'Back imprinted. Hip flexor + core coordination':'Legs and arms both up — hardest Pilates abs exercise'),
+      ex(w===2?'Bicycle':'Side Kick Series','3×'+(w===2?'15 each':'10 each'),w===2?'Controlled rotation — obliques + hip flexors':'Side lying kick series — glute med in non-loaded position'),
+    ]),
+    ph('💪 Calisthenics — W'+(w+1),['cali'],[
+      ex(w===0?'Incline Push-Up':w===1?'Full Push-Up':w===2?'Decline Push-Up':'Max Push-Up Test','3×'+(w===3?'1 max set':w===0?'10':w===1?'10':'8'),w===0?'Hands on sofa. Builds to floor push-ups':w===1?'Full range — chest touches floor':w===2?'Feet on sofa — handstand push-up position':'Count every full rep — log it, beat it next cycle'),
+      ex(w===0?'Dead Hang':w===1?'Scapular Pull-Up':w===2?'Negative Pull-Up':'Planche Lean','3×'+(w===2?'3 slow':w===3?'15 sec':'20-30 sec'),w===0?'Step 1 toward pull-ups — grip + shoulder health':w===1?'Pack shoulders DOWN in dead hang — activates lats':w===2?'Jump to top, lower in 5 sec — best pull-up builder':'Lean forward over wrists — straight-arm push base'),
+      ex('Hollow Body '+(w<2?'Hold':'Rock'),'3×'+(w<2?'15':'10')+' sec','Foundation of all calisthenics skills. Flat back, arms up, legs up'),
+      ex(w===0?'Wall Sit':w===1?'Tuck Sit on Floor':w===2?'L-Sit Tuck Hold':'Plank Posterior Tilt','3×'+(w<2?'30 sec':'15 sec'),w===0?'90° knee, knees track over toes — valgus awareness under load':w===1?'Hands beside hips, tuck knees, try to lift — L-sit step 1':w===2?'Lift hips off floor — progression toward full L-sit':'Tuck tailbone UNDER in plank — correct APT position'),
+    ]),
+    ph('🤸 Splits — W'+(w+1),['splits'],[
+      ex('Low Lunge Hip Flexor',w===0?'60 sec each':w===1?'90 sec each':w===2?'2 min each':'2 min each','Front splits prep. Hip flexor length is the main limiter'),
+      ex(w<2?'Butterfly Stretch':'PNF Hamstring',w<2?'90 sec':' 3×(10s contract + 30s relax)',w<2?'Middle splits — adductor opening. Soles of feet together':' CONTRACT-RELAX: flex hamstring hard 10sec, completely release and sink deeper'),
+      ex(w===0?'Wide Stance Forward Fold':w===1?'Seated Straddle Forward Fold':w===2?'Active Front Split':'Full Splits Sequence Long Holds',w===3?'20 min':'60-90 sec each',w===3?'Deload = best week for passive long holds — body is less fatigued':'Middle splits prep — walk hands forward as far as possible'),
+    ]),
+  ],
+},
+
+// ─── WED: GLUTE B + ABS + PUSH ───────────────────────────────
+{ day:'Wednesday', label:'GLUTE B + ABS + PUSH', tag:'Glute Day 2 · Squat Pattern', color:'#A89BC0',
+  focus:'Squat pattern glutes · medius shape · weighted abs · push progressions', goals:['glute','abs','valgus','cali'],
+  hasMT:false,
+  phases: w => [
+    ph('🔥 Activation + Valgus',['glute','valgus'],[
+      ex('Banded Monster Walk','2×20 steps each','Glute medius endurance — fixes knee valgus in dynamic movement'),
+      ex(w===0?'Squat to Stand':w===1?'Hip 90/90 Switches':'Banded Squat Pulse','2×10','Mobility prep for squatting pattern'),
+    ]),
+    ph(w===2?'🍑 Glute B — HEAVY':w===3?'🍑 Glute B — Deload':'🍑 Glute B — '+['Foundation','Volume'][Math.min(w,1)],['glute','valgus'],[
+      // Hip Thrust on every glute day — non-negotiable
+      ex('Barbell Hip Thrust', w===0?'4×12':w===1?'5×10':w===2?'4×8':'3×15 tempo', w===0?'Every glute day has hip thrust. Moderate weight — this is your second session this week':w===1?'Progressive overload — heavier than Monday':w===2?'HEAVY — push hard on W3. Full lockout every rep':'Slow tempo 3-1-3. Light weight, feel the contraction'),
+      // RDL on every glute day
+      ex('Romanian Deadlift', w===0?'3×12':w===1?'4×10':w===2?'4×8':'3×12', w===0?'Stretch-mediated loading — pairs perfectly with hip thrust. Feel the hamstring lengthen':w===1?'Heavier than Monday. 1-sec pause at bottom':w===2?'Heaviest yet — keep back flat throughout':'Light — focus on feel, not weight'),
+      ...( w===3?[
+        ex('Sumo Squat DB Slow','3×20','3 sec down, pause, 2 sec up. Light weight — feel adductors + glutes'),
+        ex('Curtsy Lunge','3×15 each','Step diagonally behind — excellent for outer glute shape'),
+        ex('Lateral Band Walk Long Set','3×25 each','Glute med endurance deload stimulus'),
+      ]: w===0?[
+        ex('Goblet Squat','4×15','Squat pattern — sit DEEP. Knees push OUT. Different stimulus to Monday hip hinge'),
+        ex('Cable Hip Abduction','4×15 each','Shelf shape builder — squeeze hard at end range'),
+        ex('Step-Up High Box','3×12 each','Drive through HEEL of working leg — feel the glute'),
+      ]: w===1?[
+        ex('Bulgarian Split Squat','3×10 each','Rear foot elevated. Drop deep. Watch knee on front leg'),
+        ex('Cable Hip Abduction','4×15 each','Add weight vs W1. Lean slightly forward for more medius'),
+        ex('Leg Press Abduction Pulse','3×20','Feet close, band above knees, press OUT — medius pump'),
+      ]:[
+        ex('Barbell Squat Banded','5×6','HEAVY — band every rep. Maintain outward knee pressure'),
+        ex('Bulgarian Split Squat','4×8 each','Add weight. These should be brutal'),
+        ex('Cable Hip Abduction','4×12 each','Heavy. 3-sec slow eccentric for max medius'),
+      ])
+    ]),
+    ph('🎯 Abs — '+(w===2?'HEAVY':w===3?'Deload':'Weighted Protocol'),['abs','posture'],[
+      ...( w===3?[
+        ex('Plank Posterior Tilt','3×45 sec','Tuck tailbone UNDER — correct APT position. Abs work harder, lower back safe'),
+        ex('Dead Bug','3×10 each','Back to basics — feel how much stronger your core is now'),
+        ex('Side Plank','3×30 sec each','Steady and still'),
+      ]:[
+        ex('Cable Crunch',w===0?'4×15':w===1?'4×12':'5×10',w===0?'Best weighted ab exercise. Round SPINE — not just hip hinge':w===1?'Add weight vs W1':'Heaviest yet. Full ROM — nose to hips'),
+        ex('Hanging '+(w===0?'Knee Raise':'Leg Raise'),w===0?'3×12':w===1?'3×10':'4×8',w===0?'Curl pelvis UP at top — activates lower abs, not just swinging':w===1?'Straight legs harder — progression from knee raise':'3-sec slow controlled descent'),
+        ex('Pallof Press','3×'+(w===2?'10':'12')+' each','Anti-rotation core — also trains posterior tilt = direct APT fix'),
+        ex('Ab Wheel Rollout','3×'+(w===0?'8':w===1?'8':'10'),"Don't let lower back sag — core must work anti-extension"),
+      ])
+    ]),
+    ph('💪 Calisthenics Push — W'+(w+1),['cali','hand'],[
+      ex(w<2?'Push-Up':'Decline Push-Up','3×'+(w===0?'10':w===1?'12':'10'),w===0?'Full range — chest touches floor':w===1?'No knee option this week':'Feet elevated — direct handstand push-up position'),
+      ex('Pike Push-Up','3×'+(w===0?'8':w===1?'10':'12'),'Downward dog — lower head toward floor. Direct handstand strength prep'),
+      ex(w===0?'Dip Negative':w===1?'Assisted Dip':'Full Dip','3×'+(w===0?'5 slow':'6'),w===0?'Lower in 5 sec — strongest at eccentric':w===1?'Band or machine assistance':'Full dips — you should be here by W3'),
+    ]),
+    ph('🧘 APT Fix',['posture'],[
+      ex('Couch Stretch','90 sec each','Every session'),
+      ...(w===1?[ex('Frog Pose','2 min','Opens adductors + hip flexors simultaneously')]:[]),
+    ]),
+  ],
+},
+
+// ─── THU: SKILLS + RECOVERY ──────────────────────────────────
+{ day:'Thursday', label:'SKILLS + RECOVERY', tag:'Handstand · Splits · Walk', color:'#7BB5C8',
+  focus:'Handstand progressions · splits programme · active recovery', goals:['hand','splits','posture'],
+  hasMT:false,
+  phases: w => [
+    ph('🚶 Active Recovery',['posture'],[
+      ex('Incline Walk 30-45 min','','Incline 6-8% — glutes engage more than flat. Great fat-burning too'),
+    ]),
+    ph('🙃 Handstand — W'+(w+1)+' '+(w===0?'Foundation':w===1?'Build':w===2?'Progress':'Maintenance'),['hand'],[
+      ex('Wrist Conditioning','2-3 min','Circles 10 each direction · compressions · prayer stretch · back of hands on floor. EVERY session'),
+      ex('Hollow Body Hold','3×'+(w===0?'20':w===1?'20':w===2?'20':'30')+' sec','THE shape of a handstand. Flat back, arms by ears, legs together'),
+      ...( w===0?[
+        ex('Wall Plank Hold','3×20 sec','Feet on wall at hip height, hands on floor. Get comfortable inverted'),
+        ex('Pike Hold','3×30 sec','High downward-dog — weight in hands, hips above head. Shoulder prep'),
+        ex('Shoulder Taps','3×10 each','Single-arm stability — needed for handstand balance'),
+      ]: w===1?[
+        ex('Hollow Body Rock','3×10','Rocking tests your ability to MAINTAIN the shape under movement'),
+        ex('Pike Push-Up','3×8','Shoulder strength component'),
+        ex('Wall Kick-Up Practice','5-8 attempts','Face away from wall. Kick up — wall is safety only, not a crutch'),
+        ex('Chest to Wall Handstand','3 holds','Back to wall, walk hands back. Begin to feel balance'),
+      ]: w===2?[
+        ex('Handstand Shoulder Shrugs at Wall','3×10','In chest-to-wall HS, push floor away — protract scapulae. Correct hand-balancing shoulder position'),
+        ex('Wall Handstand Timed Hold','5×10-20 sec','Increase duration vs W2. Straight body, engaged core, pointed toes'),
+        ex('Freestanding Kick-Up Attempts','8-10 attempts','Away from wall — find the balance point for a moment. No expectation'),
+        ex('Pike Push-Up','3×10',''),
+      ]:[
+        ex('Wall Handstand Holds','3 holds','Deload — maintain the skill, do not push for progress this week'),
+        ex('Doorframe Chest Stretch','60 sec each','Opens shoulders → improves overhead mobility → handstand gets easier'),
+        ex('Pike Hold','3×30 sec','Maintain shoulder strength base'),
+      ])
+    ]),
+    ph('🤸 Front Splits — W'+(w+1),['splits'],[
+      ex('Low Lunge Hip Flexor',w===3?'2 min each — long hold':'90 sec each',w===0?'Drive front knee forward, sink hips. Main limiter for front splits':'Deeper than previous week — 5-10% more range'),
+      ex(w<1?'Standing Forward Fold':'PNF Hamstring',w<1?'2 min':'3×(10s contract + 30s release)',w<1?'Hamstring length for front splits — bend knees if needed, gradually straighten':'CONTRACT-RELAX: flex hamstring hard 10sec, completely release and go deeper. Fastest method'),
+      ex('Half Split',w===3?'2 min each':'60-90 sec each','Front leg straight, back knee down — hamstring + hip flexor simultaneously'),
+    ]),
+    ph('🤸 Middle Splits — W'+(w+1),['splits'],[
+      ex('Butterfly Stretch',w===3?'3 min':'90 sec-2 min',w===0?'Soles of feet together. Lean forward — hold still and breathe':'Deeper than last week. Use elbows on inner knees to gently increase range'),
+      ex(w<2?'Wide Stance Forward Fold':'Pancake Stretch',w<2?'2 min':'3 min',w<2?'Stand with feet wide, fold forward. Let gravity work':'Straddle on floor, fold forward flat. Walk hands as far as possible'),
+      ...(w>0?[ex('PNF Adductors (for straddle)','3×(10s+30s)','In wide straddle: flex inner thighs as if squeezing legs together 10sec, release and fold deeper')]:[]),
+    ]),
+  ],
+},
+
+// ─── FRI: GLUTE C + UPPER + PULL ─────────────────────────────
+{ day:'Friday', label:'GLUTE C + UPPER + PULL', tag:'Glute Day 3 · Isolation', color:'#E2957F',
+  focus:'Glute isolation + medius shape · posture upper body · pull-up progression', goals:['glute','posture','cali','valgus'],
+  hasMT:false,
+  phases: w => [
+    ph('🔥 Activation',['glute','valgus'],[
+      ex('Donkey Kick Banded','3×15 each',w===0?'Target upper glute + medius. Leg stays bent at 90° — do not swing':'Heavier band than last week'),
+      ex('Fire Hydrant','3×15 each','Paired with donkey kick — complete glute medius warm-up'),
+      ex(w<2?'Single Leg Balance':'Single Leg Balance Eyes Closed','2×30 sec each',w<2?'Proprioception training for valgus. Eyes open first':'Eyes closed is significantly harder — advanced proprioception'),
+    ]),
+    ph(w===2?'🍑 Glute C — HEAVY':w===3?'🍑 Glute C — Deload':'🍑 Glute C — '+(w===0?'Isolation + Shape':'Volume'),['glute'],[
+      // Hip Thrust on every single glute day — non-negotiable
+      ex('Barbell Hip Thrust', w===0?'4×12':w===1?'5×10':w===2?'4×6':'3×15 tempo', w===0?'3rd glute session this week — lighter than Monday/Wed is fine, focus on full contraction':w===1?'Add weight vs Wednesday — keep the progression going':w===2?'HEAVY — full lockout every rep':'Slow tempo 3-1-3. Light bar, feel the glute completely'),
+      // RDL on every glute day — stretch-mediated loading drives hypertrophy
+      ex('Romanian Deadlift', w===0?'3×10':w===1?'3×10':w===2?'3×8':'3×10', w===0?'Stretch-mediated loading. Hip thrust + RDL together = the most effective glute pairing':w===1?'Heavier than W1':w===2?'Heavy — bar close to legs throughout':'Lighter, perfect feel'),
+      ...( w===3?[
+        ex('Banded Crab Walk','3×20 each way','Glute med endurance — wide stance, band above knees, walk sideways'),
+        ex('Resistance Band Kickback High Rep','3×20 each','Light band — high rep metabolic stimulus'),
+        ex('Glute Hyperextension Banded','3×15','Glute-ham tie-in area'),
+      ]:[
+        ex('Cable Kickback',w===0?'4×15 each':w===1?'5×12 each':'4×10 each',w===0?'Toe pointed down. 3-sec slow eccentric — upper glute':w===1?'More sets, heavier. 4-sec slow return':'HEAVY — no swinging. Slow eccentric'),
+        ex('Hip Abduction Machine',w===0?'4×15':w===1?'5×12':'4×10',w===0?'THE shelf shape builder — squeeze 1 sec at end range':w===1?'Add weight. Pause 1 sec at full abduction':'Heavy — 2-sec pause at full range every rep'),
+        ex('Frog Pump','3×20','Soles of feet together on floor — incredible glute medius isolation'),
+        ...(w===1?[ex('Single Leg Cable Kickback','3×12 each','Harder version — reveals balance and isolation quality')]:[]),
+      ])
+    ]),
+    ph('💪 Upper Body + Posture',['posture','cali'],[
+      ex('Lat Pulldown',w===2?'4×6':'3×'+(w===0?'12':'10'),'V-taper makes waist look smaller. Elbows drive DOWN and back — lats not arms'),
+      ex(w===1?'Single Arm DB Row':'Seated Cable Row','3×'+(w===2?'8':'12'),w===1?'More range of motion — better lat stretch at bottom':'Retract shoulder blades completely. Direct posture fix'),
+      ex('Face Pull','3×15','MUST do every upper body session. External rotation — fixes rounded shoulders'),
+      ex('DB Shoulder Press','3×'+(w===2?'8':'12'),'Shoulder caps enhance hourglass shape'),
+      ex('DB Lateral Raise','3×15','Side deltoids — shoulder width makes waist look narrower'),
+    ]),
+    ph('💪 Calisthenics Pull — W'+(w+1),['cali'],[
+      ...( w===0?[
+        ex('Dead Hang','3×20-30 sec','Step 1. Grip, shoulder health, lat activation — essential foundation'),
+        ex('Scapular Pull-Up','3×8','Pack shoulders DOWN in dead hang — no elbow bend. Activates lats for real pull-up'),
+        ex('Band Assisted Pull-Up','3×5','Full ROM with assistance. Step 3 toward unassisted'),
+      ]: w===1?[
+        ex('Band Assisted Pull-Up','3×6-7','More reps than W1 — progressing'),
+        ex('Negative Pull-Up','2×3 slow','Jump to top, lower in 5 sec. The most effective pull-up strength builder'),
+        ex('Scapular Pull-Up','2×10',''),
+      ]: w===2?[
+        ex('Weighted Pull-Up or Lightest Band','4×6','Best upper back exercise. Getting close to unassisted'),
+        ex('Negative Pull-Up','3×4-5 slow','More volume than W2 — getting strong'),
+        ex('Bent Over Barbell Row','3×8','Rear delts, rhomboids, lats — posture powerhouse'),
+      ]:[
+        ex('Max Pull-Up Test','1 max set','Count every rep — this is your benchmark to beat next cycle'),
+        ex('Cable Pullover','3×15','Lat isolation for V-taper'),
+        ex('Band Pull-Apart','3×20','Posture maintenance — rear delts + external rotation'),
+      ])
+    ]),
+    ph('🧘 Posture Reset',['posture'],[
+      ex('Thoracic Foam Roll','2 min','Opens chest, undoes desk and phone posture. Roll the upper back'),
+      ex('Couch Stretch','90 sec each','Every session ends with this'),
+    ]),
+  ],
+},
+
+// ─── SAT: MOBILITY + FLEXIBILITY ─────────────────────────────
+{ day:'Saturday', label:'MOBILITY + FLEXIBILITY', tag:'Splits · Handstand · Restore', color:'#8BBAA8',
+  focus:'Deep flexibility · splits deepening · handstand practice · full recovery', goals:['splits','hand','posture'],
+  hasMT:true,
+  phases: w => [
+    ph('☀️ Sun Salutation Warm-Up',['posture'],[
+      ex('Sun Salutation A','3-5 rounds','Flow: Mountain → Forward fold → Half lift → Plank → Chaturanga → Upward dog → Downward dog → repeat. Connects breath to movement', true),
+      ex('Cat-Cow in Downward Dog','10 breaths','Pedal the feet, shift hips side to side. Warm up the whole posterior chain', true),
+    ]),
+    ph('🧘 Standing Poses — Posture + Strength',['posture','glute'],[
+      ex('Warrior I','60 sec each side','Front knee over ankle, back foot at 45°. Hip flexor stretch + glute activation. DIRECTLY fixes APT', true),
+      ex('Warrior II','60 sec each side','Open hip position. Strengthens glute med — valgus correction in functional stance', true),
+      ex('Triangle Pose','60 sec each side','Hamstring + inner thigh + thoracic rotation combined', true),
+      ex(w<2?'Warrior III (modified ok)':'Warrior III Full','45 sec each side','Single leg balance — advanced proprioception and glute stability. Same chain as knee valgus correction', true),
+    ]),
+    ph('🤸 Hip Opening — Splits Prep',['splits','glute'],[
+      ex('Low Lunge / Crescent Pose','90 sec each side','The single most useful yoga pose for your goals. Hip flexor + quad + glute in one', true),
+      ex('Pigeon Pose','2 min each side',w<2?'Walk hands forward and breathe into it. Deep external rotation release':'W'+( w+1)+' — go deeper than last time. Stay passive and let the hip open', true),
+      ex('Half Splits','90 sec each side','Front leg straight, back knee down. Hamstring lengthening = front splits progress', true),
+      ex(w>0?'Full Pigeon or Double Pigeon':'Seated Butterfly','2 min',w>0?'Double pigeon (fire log pose) — intense adductor and glute med stretch. Middle splits prep':'Soles together. Lean forward and hold', true),
+      ex('Wide Leg Forward Fold','2 min','Gravity-assisted adductor stretch. Middle splits foundation', true),
+    ]),
+    ph('🙃 Handstand Prep',['hand'],[
+      ex('Wrist Conditioning','2 min','Circles, compressions, prayer stretch — protect your wrists every time', true),
+      ex('Downward Dog to Pike Walk','10 reps','Walk feet toward hands until hips stack over shoulders. Builds the overhead load tolerance for handstand', true),
+      ex(w===0?'Dolphin Pose Hold':w===1?'Dolphin Push-Ups':'Wall Handstand Holds','3×'+(w===2?'holds':'30 sec'),w===0?'Forearm stand prep — builds shoulder and core strength for inversion':w===1?'Lower and raise in dolphin — direct handstand push-up strength':'Reinforce the week\'s handstand work', true),
+    ]),
+    ph('🧘 Restore + APT Fix',['posture'],[
+      ex('Bridge Pose','3×15','Controlled up and down — glute activation + spinal articulation. APT corrective', true),
+      ex('Supine Twist','2 min each side','Completely passive. Release everything built up this week', true),
+      ex('Legs Up the Wall','5 min','Hamstring release + lower back decompression. Parasympathetic recovery', true),
+      ex('Savasana','3-5 min','Let everything integrate. Not optional', true),
+    ]),
+  ],
+  phasesHome: w => [
+    ph('🧘 Full Body Mobility',['posture'],[
+      ex('Cat-Cow','3×10 breaths','Slow — each inhale arches, each exhale rounds. Spine segmental mobility'),
+      ex('Thread the Needle','60 sec each','Thoracic rotation + shoulder opening — chest opens = better posture'),
+      ex('Thoracic Foam Roll','2 min','Find stiff segments and breathe into them'),
+      ex('World\'s Greatest Stretch','5 each side','Lunge + reach — hits hip flexor, thoracic, hamstring in one movement'),
+    ]),
+    ph('🤸 Full Splits Session — W'+(w+1),['splits'],[
+      ex('Low Lunge Sequence',w<3?'90 sec each':'2 min each','Front splits prep — sink deeper each breath, use gravity'),
+      ex(w<2?'Butterfly Stretch':'PNF Adductors',w<2?'2 min':'3×(10s+30s)',w<2?'Middle splits — adductors. Soles of feet together':'CONTRACT-RELAX in straddle position — fastest way to gain middle split range'),
+      ex(w===0?'Wide Stance Forward Fold':w===1?'Pancake Stretch':w===2?'Active Front Split':'Full Splits Long Holds',w<2?'2 min':w===2?'3×45 sec each':'20 min total',w===3?'Deload = best week for passive long holds. Body is less fatigued — use it':'Middle splits prep — walk hands as far forward as possible'),
+      ...(w>0?[ex('Dragon Pose','90 sec each','Deep low lunge — hip flexor + quad stretch simultaneously')]:[]),
+    ]),
+    ph('🙃 Handstand Practice',['hand'],[
+      ex('Wrist Conditioning','2 min','Every session — protect your wrists'),
+      ex(w<2?'Wall Handstand Holds':'Freestanding Balance Attempts',w===0?'3-5 holds':w===1?'5 holds':'8-10 attempts',w===0?'Chest to wall, walk hands back. Find your balance point':w===1?'Increase hold duration vs W1':'Away from wall — commit to each kick-up. Find the moment of balance'),
+      ex('Pike Hold','3×30 sec','Maintain shoulder strength base'),
+    ]),
+  ],
+},
+
+// ─── SUN: REST ────────────────────────────────────────────────
+{ day:'Sunday', label:'FULL REST', tag:'Rest + Recover', color:'#C2B49E',
+  focus:'Sleep · eat · recover · grow', goals:['posture'],
+  hasMT:false,
+  phases: _w => [
+    ph('😴 Growth Happens Now',['posture'],[
+      ex('Sleep 7-9 Hours','Priority','Growth hormone is released in deep sleep stages 3 and 4. Glutes literally grow overnight — protect your sleep'),
+      ex('Hit Protein Target','All day','1.6-2g per kg bodyweight. Without adequate protein, training produces far less result'),
+      ex('Hip Flexor Stretch','5 min','APT fix requires daily work — even on rest days. Couch stretch both sides'),
+      ex('Short Walk','20-30 min optional','Does not affect recovery. Keeps steps and insulin sensitivity up'),
+    ]),
+  ],
+},
+
+]; // end PLAN
+
+// ════════════════════════════════════════════════════
+// STATE
+// ════════════════════════════════════════════════════
+let aWeek = load('gl_week', 0);
+let aCycle = load('gl_cycle', 1); // 1-based cycle number
+const jsDay = today.getDay(); // 0=Sun
+let aDay = jsDay === 0 ? 6 : jsDay - 1; // 0=Mon
+let openPh = new Set();
+let homeMode = { Tuesday: false, Saturday: false };
+let activePTab = 'exercises';
+let selEx = null;
+let selBodyStat = 'weight';
+
+// Restore home modes
+['Tuesday','Saturday'].forEach(d => {
+  homeMode[d] = loadStr('gl_hm_'+d, '0') === '1';
+});
+
+// ════════════════════════════════════════════════════
+// SCREEN NAV
+// ════════════════════════════════════════════════════
+function showScreen(id) {
+  ['sw','sm','sp','ss'].forEach(s => {
+    const el = $(s); if (el) el.classList.remove('active');
+    const nb = $('nav-'+s); if (nb) nb.classList.remove('on');
+  });
+  $(id).classList.add('active');
+  $('nav-'+id).classList.add('on');
+  if (id === 'sm') renderMeals();
+  if (id === 'sp') renderPTab(activePTab);
+  if (id === 'ss') renderSettings();
+}
+
+// ════════════════════════════════════════════════════
+// WEEK BAR
+// ════════════════════════════════════════════════════
+function renderWeekBar() {
+  $('wbar').innerHTML = WEEKS.map((w,i) =>
+    `<button class="wb${i===aWeek?' on':''}" onclick="selWeek(${i})">${w.l}</button>`
+  ).join('');
+  $('cyclebadge').innerHTML = `<div class="cycle-badge">🔄 Cycle ${aCycle}${aCycle>1?' · '+((aCycle-1)*4)+' weeks complete':' · First cycle'}</div>`;
+  $('wdesc').textContent = WEEKS[aWeek].d;
+}
+function selWeek(i) {
+  aWeek = i; openPh.clear();
+  store('gl_week', i);
+  renderWeekBar(); renderDay();
+}
+
+// ════════════════════════════════════════════════════
+// DAY PILLS
+// ════════════════════════════════════════════════════
+function renderDayPills() {
+  $('dpills').innerHTML = PLAN.map((d, i) =>
+    `<button class="dp${i===aDay?' on':''}" style="${i===aDay?'background:'+d.color+';':''}"
+      onclick="selDay(${i})">${d.day.slice(0,3).toUpperCase()}</button>`
+  ).join('');
+}
+function selDay(i) {
+  aDay = i; openPh.clear();
+  renderDayPills(); renderDay();
+}
+
+// ════════════════════════════════════════════════════
+// MODE TOGGLE
+// ════════════════════════════════════════════════════
+function renderModeToggle() {
+  const d = PLAN[aDay];
+  if (!d.hasMT) { $('mtog').innerHTML = ''; return; }
+  const h = homeMode[d.day];
+  $('mtog').innerHTML = `<div class="mtog">
+    <button class="mt${!h?' on':''}" onclick="setMode('${d.day}',false)">🏫 At Studio</button>
+    <button class="mt${h?' on':''}" onclick="setMode('${d.day}',true)">🏠 Home Today</button>
+  </div>`;
+}
+function setMode(day, home) {
+  homeMode[day] = home; openPh.clear();
+  store('gl_hm_'+day, home ? '1' : '0');
+  renderModeToggle(); renderDay();
+}
+
+// ════════════════════════════════════════════════════
+// STEPS
+// ════════════════════════════════════════════════════
+function renderSteps() {
+  const s = loadStr('gl_steps_'+todayStr, '');
+  const pct = s ? Math.min(100, Math.round(parseInt(s)/10000*100)) : 0;
+  $('stepsc').innerHTML = `<div class="scard">
+    <span style="font-size:20px">👟</span>
+    <div style="flex:1">
+      <div style="font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--warm);margin-bottom:3px">Daily Steps</div>
+      <div style="display:flex;align-items:center;gap:7px">
+        <input class="sinp" type="number" placeholder="0" value="${esc(s)}"
+          oninput="saveSteps(this.value)" onchange="saveSteps(this.value)"/>
+        <span style="font-size:10px;color:var(--warm)">/ 10,000 ${pct>=100?'✅':''}</span>
+      </div>
+      <div style="display:flex;align-items:center;gap:5px;margin-top:4px">
+        <div class="sbar" style="flex:1"><div class="sbpb" style="width:${pct}%"></div></div>
+        <span style="font-size:9px;color:var(--warm)">${pct}%</span>
+      </div>
+    </div>
+  </div>`;
+}
+function saveSteps(v) { store('gl_steps_'+todayStr, v); renderSteps(); }
+
+// ════════════════════════════════════════════════════
+// GET PHASES for current state
+// ════════════════════════════════════════════════════
+function getPhases() {
+  const d = PLAN[aDay];
+  try {
+    if (d.hasMT && homeMode[d.day] && d.phasesHome) {
+      return d.phasesHome(aWeek);
+    }
+    return d.phases(aWeek);
+  } catch(e) {
+    console.error('getPhases error', e);
+    return [];
+  }
+}
+
+// ════════════════════════════════════════════════════
+// SET STORAGE
+// ════════════════════════════════════════════════════
+function exSlug(name) { return slug(name); }
+function setKey(name) { return 'gl_sets_'+exSlug(name)+'_'+todayStr; }
+function parseSetCount(str) {
+  if (!str) return 3;
+  const m = str.match(/^(\d+)[×x×]/i);
+  return m ? Math.min(parseInt(m[1]), 8) : 3;
+}
+function getSets(name, numSets) {
+  const d = load(setKey(name), null);
+  if (d && Array.isArray(d)) {
+    // Ensure at least numSets entries
+    while (d.length < numSets) d.push({w:'',r:'',df:''});
+    return d;
+  }
+  return Array.from({length: numSets}, () => ({w:'',r:'',df:''}));
+}
+function saveSets(name, sets) { store(setKey(name), sets); }
+
+// History across all dates for one exercise
+function getHistory(name) {
+  const sl = exSlug(name);
+  const prefix = 'gl_sets_'+sl+'_';
+  const results = [];
+  try {
+    for (let k in localStorage) {
+      if (k.startsWith(prefix)) {
+        const dateStr = k.slice(prefix.length);
+        if (!/^\d{4}-\d{2}-\d{2}$/.test(dateStr)) continue;
+        const sets = load(k, []);
+        const wts = sets.map(s => parseFloat(s.w)||0).filter(v=>v>0);
+        const reps = sets.map(s => parseInt(s.r)||0).filter(v=>v>0);
+        const anythingLogged = sets.some(s=>s.df||s.w||s.r);
+        if (anythingLogged) {
+          results.push({
+            date: dateStr,
+            maxW: wts.length ? Math.max(...wts) : 0,
+            avgR: reps.length ? Math.round(reps.reduce((a,b)=>a+b,0)/reps.length) : 0,
+            vol: sets.reduce((acc,s)=>{
+              const w=parseFloat(s.w)||0, r=parseInt(s.r)||0;
+              return acc + (w*r);
+            }, 0),
+            sets,
+          });
+        }
+      }
+    }
+  } catch(e) {}
+  return results.sort((a,b) => a.date.localeCompare(b.date));
+}
+
+// ════════════════════════════════════════════════════
+// RENDER DAY
+// ════════════════════════════════════════════════════
+function renderDay() {
+  const d = PLAN[aDay];
+
+  // Day label
+  $('dlabel').innerHTML = `<div class="dlabel">
+    <div class="ddot" style="background:${d.color}">${d.day.slice(0,3)}</div>
+    <div style="flex:1">
+      <div class="dtag" style="color:${d.color}">${d.tag} · ${WEEKS[aWeek].l}</div>
+      <div class="dname">${esc(d.label)}</div>
+      <div class="dfoc">${esc(d.focus)}</div>
+      <div class="chips">${chipHTML(d.goals)}</div>
+    </div>
+  </div>`;
+
+  renderSteps();
+
+  const phases = getPhases();
+  renderExSec(phases, d);
+}
+
+function renderExSec(phases, d) {
+  // Count progress
+  let tot = 0, done = 0;
+  phases.forEach(ph => ph.items.forEach(ex => {
+    tot++;
+    if (ex.noSets) {
+      if (getSimpleDone(ex.name)) done++;
+    } else {
+      const ns = parseSetCount(ex.sets);
+      const sd = getSets(ex.name, ns);
+      if (sd.some(s => s.df)) done++;
+    }
+  }));
+  const pct = tot > 0 ? Math.round(done/tot*100) : 0;
+  $('pb').style.width = pct + '%';
+  $('pbtxt').textContent = `${done} / ${tot} exercises logged`;
+
+  $('esec').innerHTML = phases.map((ph, pi) => {
+    const open = openPh.has(pi);
+    const phChips = ph.goals ? chipHTML(ph.goals) : '';
+    return `<div class="ecard">
+      <div class="phdr" data-pi="${pi}">
+        <div>
+          <div class="ptitle">${esc(ph.phase)}</div>
+          <div class="chips" style="margin-top:4px">${phChips}</div>
+        </div>
+        <span class="ptog">${open ? '−' : '+'}</span>
+      </div>
+      ${open ? `<div class="pbdy">${ph.items.map((ex, ei) => renderExRow(ex, pi, ei, d)).join('')}</div>` : ''}
+    </div>`;
+  }).join('');
+
+  // Attach events (delegation)
+  const sec = $('esec');
+  sec.onclick = handleSecClick;
+  sec.onchange = handleSecChange;
+}
+
+function handleSecClick(e) {
+  // Phase header toggle
+  const phdr = e.target.closest('.phdr[data-pi]');
+  if (phdr) {
+    const pi = parseInt(phdr.dataset.pi);
+    openPh.has(pi) ? openPh.delete(pi) : openPh.add(pi);
+    const phases = getPhases();
+    renderExSec(phases, PLAN[aDay]);
+    return;
+  }
+  // Exercise checkbox
+  const ck = e.target.closest('.exck[data-name]');
+  if (ck) {
+    const name = ck.dataset.name;
+    if (ck.dataset.nosets) {
+      // Simple toggle for Pilates/yoga/stretch exercises
+      setSimpleDone(name, !getSimpleDone(name));
+    } else {
+      const ns = parseInt(ck.dataset.ns);
+      const sd = getSets(name, ns);
+      const allDone = sd.every(s => s.df !== '');
+      sd.forEach(s => { s.df = allDone ? '' : (s.df || 'easy'); });
+      saveSets(name, sd);
+    }
+    updStreak();
+    const phases = getPhases();
+    renderExSec(phases, PLAN[aDay]);
+    return;
+  }
+  // Difficulty button
+  const db = e.target.closest('.dbtn[data-name]');
+  if (db) {
+    const name = db.dataset.name;
+    const ns = parseInt(db.dataset.ns);
+    const si = parseInt(db.dataset.si);
+    const diff = db.dataset.diff;
+    const sd = getSets(name, ns);
+    sd[si].df = sd[si].df === diff ? '' : diff;
+    saveSets(name, sd);
+    updStreak();
+    // Re-render just this row's sets area
+    const phases = getPhases();
+    renderExSec(phases, PLAN[aDay]);
+    return;
+  }
+  // Add set
+  const asb = e.target.closest('.addset[data-name]');
+  if (asb) {
+    const name = asb.dataset.name;
+    const ns = parseInt(asb.dataset.ns);
+    const sd = getSets(name, ns);
+    sd.push({w:'', r:'', df:''});
+    saveSets(name, sd);
+    // keep phases open
+    const phases = getPhases();
+    renderExSec(phases, PLAN[aDay]);
+    return;
+  }
+}
+
+function handleSecChange(e) {
+  const inp = e.target.closest('.inp[data-name]');
+  if (!inp) return;
+  const name = inp.dataset.name;
+  const ns = parseInt(inp.dataset.ns);
+  const si = parseInt(inp.dataset.si);
+  const field = inp.dataset.field;
+  const sd = getSets(name, ns);
+  while (sd.length <= si) sd.push({w:'',r:'',df:''});
+  sd[si][field] = e.target.value;
+  saveSets(name, sd);
+}
+
+// Simple done key for noSets exercises (Pilates, yoga, stretches)
+function simpleKey(name) { return 'gl_done_'+slug(name)+'_'+todayStr; }
+function getSimpleDone(name) { return loadStr(simpleKey(name),'') === '1'; }
+function setSimpleDone(name, val) { store(simpleKey(name), val ? '1' : '0'); }
+
+function renderExRow(ex, pi, ei, d) {
+  // noSets = Pilates/yoga/stretches — just a checkbox, no weight logging
+  if (ex.noSets) {
+    const done = getSimpleDone(ex.name);
+    return `<div class="exrow">
+      <div class="extop">
+        <div class="exck${done?' on':''}" data-name="${esc(ex.name)}" data-nosets="1">${done?'✓':''}</div>
+        <div class="exinf">
+          <div class="exnm${done?' done':''}">${esc(ex.name)}</div>
+          ${ex.sets ? `<span class="badge" style="background:${d.color}25;color:${d.color}">${esc(ex.sets)}</span>` : ''}
+          ${ex.note ? `<p class="exnt">${esc(ex.note)}</p>` : ''}
+        </div>
+      </div>
+    </div>`;
+  }
+
+  const ns = parseSetCount(ex.sets);
+  const sd = getSets(ex.name, ns);
+  const allDone = sd.every(s => s.df !== '');
+  const hist = getHistory(ex.name);
+  const prev = hist.filter(h => h.date < todayStr).slice(-1)[0];
+  const prevStr = prev && prev.maxW > 0
+    ? `📌 Last: ${prev.maxW}kg max · ${prev.avgR} avg reps · ${prev.date.slice(5)}`
+    : prev ? `📌 Last logged: ${prev.date.slice(5)}` : '';
+
+  return `<div class="exrow">
+    <div class="extop">
+      <div class="exck${allDone?' on':''}" data-name="${esc(ex.name)}" data-ns="${ns}">${allDone?'✓':''}</div>
+      <div class="exinf">
+        <div class="exnm${allDone?' done':''}">${esc(ex.name)}</div>
+        ${ex.sets ? `<span class="badge" style="background:${d.color}25;color:${d.color}">${esc(ex.sets)}</span>` : ''}
+        ${ex.note ? `<p class="exnt">${esc(ex.note)}</p>` : ''}
+        ${prevStr ? `<div class="prev">${esc(prevStr)}</div>` : ''}
+        <div class="sets-wrap">
+          <div class="set-lbl">Log each set:</div>
+          ${sd.map((s, si) => renderSetRow(ex.name, ns, si, s)).join('')}
+          <button class="addset" data-name="${esc(ex.name)}" data-ns="${ns}">+ Add Set</button>
+        </div>
+      </div>
+    </div>
+  </div>`;
+}
+
+function renderSetRow(name, ns, si, s) {
+  const dn = esc(name);
+  return `<div class="set-row">
+    <div class="snum${s.df?' on':''}">${si+1}</div>
+    <input class="inp inp-w" type="number" placeholder="kg"
+      value="${esc(s.w)}" data-name="${dn}" data-ns="${ns}" data-si="${si}" data-field="w"/>
+    <input class="inp inp-r" type="number" placeholder="reps"
+      value="${esc(s.r)}" data-name="${dn}" data-ns="${ns}" data-si="${si}" data-field="r"/>
+    <button class="dbtn${s.df==='easy'?' easy':''}" data-name="${dn}" data-ns="${ns}" data-si="${si}" data-diff="easy">😌</button>
+    <button class="dbtn${s.df==='hard'?' hard':''}" data-name="${dn}" data-ns="${ns}" data-si="${si}" data-diff="hard">😤</button>
+    <button class="dbtn${s.df==='fail'?' fail':''}" data-name="${dn}" data-ns="${ns}" data-si="${si}" data-diff="fail">💀</button>
+  </div>`;
+}
+
+// ════════════════════════════════════════════════════
+// MEALS
+// ════════════════════════════════════════════════════
+const MEALS = [{n:'Breakfast',i:'🌅'},{n:'Lunch',i:'☀️'},{n:'Dinner',i:'🌙'},{n:'Snacks',i:'🍎'}];
+function mealKey(n) { return 'gl_meal_'+n+'_'+todayStr; }
+function waterKey() { return 'gl_water_'+todayStr; }
+
+function renderMeals() {
+  const wcount = load(waterKey(), 0);
+  $('mealsec').innerHTML = MEALS.map(m => {
+    const s = load(mealKey(m.n), {});
+    return `<div class="mcrd">
+      <div class="mh3">${m.i} ${m.n}</div>
+      <textarea class="mta" placeholder="What did you eat?" onchange="saveMeal('${m.n}','food',this.value)">${esc(s.food||'')}</textarea>
+      <div class="mrow">
+        <div class="mwrap"><div class="mlbl">Protein g</div>
+          <input class="minp" type="number" placeholder="0" value="${s.p||''}" onchange="saveMeal('${m.n}','p',this.value)"/></div>
+        <div class="mwrap"><div class="mlbl">Carbs g</div>
+          <input class="minp" type="number" placeholder="0" value="${s.c||''}" onchange="saveMeal('${m.n}','c',this.value)"/></div>
+        <div class="mwrap"><div class="mlbl">Fat g</div>
+          <input class="minp" type="number" placeholder="0" value="${s.f||''}" onchange="saveMeal('${m.n}','f',this.value)"/></div>
+      </div>
+    </div>`;
+  }).join('') + `
+  <div class="mcrd">
+    <div class="mh3">💧 Water</div>
+    <p style="font-size:10px;color:var(--warm);margin-bottom:8px">Tap glasses to track · aim for 8 (≈3L)</p>
+    <div style="display:flex;flex-wrap:wrap;gap:5px;align-items:center">
+      ${Array.from({length:8},(_,i)=>`<div class="wglass${i<wcount?' on':''}" onclick="togWater(${i})">${i<wcount?'💧':'○'}</div>`).join('')}
+      <span style="font-size:11px;color:var(--warm);margin-left:4px">${wcount}/8</span>
+    </div>
+  </div>
+  <div class="mcrd" id="totals"></div>`;
+  calcTotals();
+}
+function saveMeal(m, f, v) {
+  const k = mealKey(m);
+  const s = load(k, {});
+  s[f] = v;
+  store(k, s);
+  calcTotals();
+}
+function calcTotals() {
+  let p=0, c=0, f=0;
+  MEALS.forEach(m => {
+    const s = load(mealKey(m.n), {});
+    p += parseFloat(s.p||0); c += parseFloat(s.c||0); f += parseFloat(s.f||0);
+  });
+  const kcal = Math.round(p*4 + c*4 + f*9);
+  const el = $('totals');
+  if (!el) return;
+  el.innerHTML = `<div class="mh3">📊 Today's Totals</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:5px;text-align:center;margin:6px 0">
+      ${[['Protein','g',Math.round(p),'var(--peach)'],['Carbs','g',Math.round(c),'var(--lav)'],['Fat','g',Math.round(f),'var(--sage)'],['Kcal','',kcal,'var(--sand)']].map(([l,u,v,col])=>`
+      <div><div style="font-family:'Cormorant Garamond',serif;font-size:24px;color:${col};line-height:1">${v}${u}</div>
+      <div style="font-size:9px;color:var(--warm);text-transform:uppercase;letter-spacing:1px;margin-top:2px">${l}</div></div>`).join('')}
+    </div>
+    <div style="padding:7px;background:var(--bg);border-radius:8px;font-size:11px;color:var(--warm);text-align:center;font-style:italic">
+      ${p < 110 ? '⚠️ Protein low — aim for 120–150g for glute growth' : '✅ Strong protein intake! Muscles will grow.'}
+    </div>`;
+}
+function togWater(i) {
+  let n = load(waterKey(), 0);
+  n = i < n ? i : i + 1;
+  store(waterKey(), n);
+  renderMeals();
+}
+
+// ════════════════════════════════════════════════════
+// STREAK
+// ════════════════════════════════════════════════════
+function updStreak() {
+  const sd = load('gl_streak', {count:0, last:'', days:[]});
+  if (sd.last !== todayStr) {
+    sd.count++;
+    sd.last = todayStr;
+    const wd = today.getDay();
+    if (!sd.days.includes(wd)) sd.days.push(wd);
+    store('gl_streak', sd);
+  }
+  // Check if W4 is substantially complete → trigger cycle completion
+  checkCycleComplete();
+}
+
+// ════════════════════════════════════════════════════
+// CYCLE SYSTEM
+// ════════════════════════════════════════════════════
+
+// Count how many exercise sessions have been logged this cycle
+function getCycleStats() {
+  const cycleStart = loadStr('gl_cycle_'+aCycle+'_start', '');
+  let sessions = 0, totalSets = 0;
+  const prs = []; // {name, weight, date}
+
+  // Scan all set logs
+  const seen = new Set();
+  try {
+    for (let k in localStorage) {
+      if (!k.startsWith('gl_sets_')) continue;
+      const parts = k.split('_');
+      const dateStr = parts[parts.length-1];
+      if (!/^\d{4}-\d{2}-\d{2}$/.test(dateStr)) continue;
+      if (cycleStart && dateStr < cycleStart) continue;
+      const sets = load(k, []);
+      const hasData = sets.some(s => s.df || s.w || s.r);
+      if (!hasData) continue;
+      const dateKey = 'sess_'+dateStr;
+      if (!seen.has(dateKey)) { seen.add(dateKey); sessions++; }
+      totalSets += sets.filter(s=>s.df||s.w||s.r).length;
+      // Track PRs
+      const sl = parts.slice(2, parts.length-1).join('_');
+      const maxW = Math.max(...sets.map(s=>parseFloat(s.w)||0));
+      if (maxW > 0) {
+        const existing = prs.find(p => p.slug === sl);
+        if (!existing || maxW > existing.weight) {
+          // Find name
+          let name = sl;
+          outer: for (const day of PLAN) {
+            for (let w=0; w<4; w++) {
+              const all = [];
+              try { all.push(...day.phases(w)); } catch(e){}
+              if (day.phasesHome) { try { all.push(...day.phasesHome(w)); } catch(e){} }
+              for (const ph of all) {
+                for (const ex of (ph.items||[])) {
+                  if (slug(ex.name) === sl) { name = ex.name; break outer; }
+                }
+              }
+            }
+          }
+          if (existing) existing.weight = maxW;
+          else prs.push({ slug: sl, name, weight: maxW, date: dateStr });
+        }
+      }
+    }
+  } catch(e) {}
+
+  // Body stat change this cycle
+  const body = load('gl_body', []);
+  const cycleBody = cycleStart ? body.filter(b => b.date >= cycleStart) : body;
+  const bodyChange = cycleBody.length >= 2 ? {
+    weight: cycleBody[cycleBody.length-1].weight && cycleBody[0].weight
+      ? (parseFloat(cycleBody[cycleBody.length-1].weight) - parseFloat(cycleBody[0].weight)).toFixed(1) : null,
+    hips: cycleBody[cycleBody.length-1].hips && cycleBody[0].hips
+      ? (parseFloat(cycleBody[cycleBody.length-1].hips) - parseFloat(cycleBody[0].hips)).toFixed(1) : null,
+  } : null;
+
+  return { sessions, totalSets, prs: prs.sort((a,b)=>b.weight-a.weight).slice(0,8), bodyChange };
+}
+
+// Check if W4 is substantially complete — called after any exercise is ticked
+function checkCycleComplete() {
+  if (aWeek !== 3) return; // Only trigger on W4
+  // Count how many W4 exercises have been logged (any day)
+  let total = 0, done = 0;
+  PLAN.forEach((day, di) => {
+    try {
+      const phases = day.phases(3);
+      phases.forEach(ph => (ph.items||[]).forEach(ex => {
+        total++;
+        if (ex.noSets) { if (getSimpleDone(ex.name)) done++; }
+        else {
+          const ns = parseSetCount(ex.sets);
+          const sd = getSets(ex.name, ns);
+          if (sd.some(s => s.df)) done++;
+        }
+      }));
+    } catch(e) {}
+  });
+  // Trigger completion modal when at least 60% of W4 is logged
+  const pct = total > 0 ? done/total : 0;
+  const alreadyShown = loadStr('gl_cycle_'+aCycle+'_complete_shown', '') === '1';
+  if (pct >= 0.6 && !alreadyShown) {
+    store('gl_cycle_'+aCycle+'_complete_shown', '1');
+    setTimeout(showCycleCompleteModal, 600);
+  }
+}
+
+function showCycleCompleteModal() {
+  const stats = getCycleStats();
+  const topPRs = stats.prs.slice(0, 5);
+  const modal = $('cycle-modal');
+
+  modal.innerHTML = `<div class="modal-bg" onclick="closeCycleModal(event)">
+    <div class="modal">
+      <div class="modal-drag"></div>
+      <div class="modal-hl">Cycle ${aCycle} Complete 🎉</div>
+      <div class="modal-title">4 Weeks Done.<br>Time to Level Up.</div>
+      <div class="modal-sub">Here's what you achieved this cycle</div>
+
+      <div class="cycle-stat-grid">
+        <div class="cycle-stat">
+          <div class="cycle-stat-n" style="color:var(--peach)">${stats.sessions}</div>
+          <div class="cycle-stat-l">Sessions</div>
+        </div>
+        <div class="cycle-stat">
+          <div class="cycle-stat-n" style="color:var(--sage)">${stats.totalSets}</div>
+          <div class="cycle-stat-l">Sets Logged</div>
+        </div>
+        <div class="cycle-stat">
+          <div class="cycle-stat-n" style="color:var(--lav)">${stats.prs.length}</div>
+          <div class="cycle-stat-l">Exercises PR'd</div>
+        </div>
+      </div>
+
+      ${topPRs.length > 0 ? `<div class="ccrd" style="margin-bottom:14px">
+        <div class="ct" style="font-size:14px;margin-bottom:8px">🏆 Your Top Lifts This Cycle</div>
+        ${topPRs.map(p => `<div class="pr-row">
+          <span style="font-size:12px;font-weight:600">${esc(p.name)}</span>
+          <span style="font-size:14px;font-weight:700;color:var(--peach)">${p.weight}kg</span>
+        </div>`).join('')}
+      </div>` : ''}
+
+      ${stats.bodyChange ? `<div class="ccrd" style="margin-bottom:14px">
+        <div class="ct" style="font-size:14px;margin-bottom:8px">📏 Body Changes This Cycle</div>
+        ${stats.bodyChange.weight !== null ? `<div class="pr-row">
+          <span style="font-size:12px">Weight</span>
+          <span style="font-size:14px;font-weight:700;color:${parseFloat(stats.bodyChange.weight)<0?'var(--sage)':'var(--peach)'}">${parseFloat(stats.bodyChange.weight)>0?'+':''}${stats.bodyChange.weight}kg</span>
+        </div>` : ''}
+        ${stats.bodyChange.hips !== null ? `<div class="pr-row">
+          <span style="font-size:12px">Hips</span>
+          <span style="font-size:14px;font-weight:700;color:${parseFloat(stats.bodyChange.hips)>0?'var(--sage)':'var(--warm)'}">${parseFloat(stats.bodyChange.hips)>0?'+':''}${stats.bodyChange.hips}cm</span>
+        </div>` : ''}
+      </div>` : ''}
+
+      <div class="ccrd" style="margin-bottom:14px;background:#17110A;color:#F5EFE8">
+        <div style="font-size:10px;letter-spacing:3px;color:var(--peach);text-transform:uppercase;margin-bottom:8px">Cycle ${aCycle+1} · What Changes</div>
+        <p style="font-size:12px;color:#8A7A6A;line-height:1.6">W1 of Cycle ${aCycle+1} uses the same exercises as Cycle ${aCycle} W1 — but your logged weights from this cycle are now shown as targets to beat. That's how progressive overload works across cycles. Every rep you logged is now your new baseline.</p>
+      </div>
+
+      <p style="font-size:11px;color:var(--warm);text-align:center;margin-bottom:12px;font-style:italic">Log your measurements before starting the next cycle for clean before/after data</p>
+
+      <button class="modal-btn modal-btn-primary" onclick="startNewCycle()">🚀 Start Cycle ${aCycle+1}</button>
+      <button class="modal-btn modal-btn-secondary" onclick="closeCycleModal()">Stay on Cycle ${aCycle}</button>
+    </div>
+  </div>`;
+  modal.style.display = 'block';
+  document.body.style.overflow = 'hidden';
+}
+
+function closeCycleModal(e) {
+  if (e && e.target !== e.currentTarget) return;
+  $('cycle-modal').style.display = 'none';
+  document.body.style.overflow = '';
+}
+
+function startNewCycle() {
+  // Save completion snapshot
+  const stats = getCycleStats();
+  store('gl_cycle_'+aCycle+'_summary', {
+    completedDate: todayStr,
+    sessions: stats.sessions,
+    totalSets: stats.totalSets,
+    prs: stats.prs,
+  });
+  // Bump cycle
+  aCycle++;
+  store('gl_cycle', aCycle);
+  store('gl_cycle_'+aCycle+'_start', todayStr);
+  // Reset to W1
+  aWeek = 0;
+  openPh.clear();
+  store('gl_week', 0);
+  closeCycleModal();
+  renderWeekBar();
+  renderDayPills();
+  renderDay();
+  // Prompt measurement
+  setTimeout(showMeasurePrompt, 400);
+}
+
+function showMeasurePrompt() {
+  const modal = $('cycle-modal');
+  modal.innerHTML = `<div class="modal-bg" onclick="closeCycleModal(event)">
+    <div class="modal">
+      <div class="modal-drag"></div>
+      <div class="modal-hl">Cycle ${aCycle} · Starting Now</div>
+      <div class="modal-title">Log Your<br>Starting Stats</div>
+      <div class="modal-sub">These become your Cycle ${aCycle} baseline — you'll see exactly what changed by Week 4</div>
+      <div class="measure-form">
+        <div class="measure-form-title">Body Measurements (optional but recommended)</div>
+        ${BSTATS.map(s=>`<div class="brow"><span class="blbl">${s.l} ${s.u}</span>
+          <input class="binp" type="number" placeholder="${s.u}" id="pm_${s.k}"/></div>`).join('')}
+        <textarea class="mta" id="pm_notes" placeholder="How are you feeling at the start of this cycle? Energy, motivation, any notes..." style="margin:5px 0;min-height:60px"></textarea>
+      </div>
+      <button class="modal-btn modal-btn-primary" onclick="saveCycleStartMeasurements()">Save & Begin Cycle ${aCycle}</button>
+      <button class="modal-btn modal-btn-secondary" onclick="closeCycleModal()">Skip for now</button>
+    </div>
+  </div>`;
+  modal.style.display = 'block';
+  document.body.style.overflow = 'hidden';
+}
+
+function saveCycleStartMeasurements() {
+  const e = { date: todayStr, cycleStart: aCycle };
+  BSTATS.forEach(s => { const el = $('pm_'+s.k); if(el && el.value) e[s.k] = el.value; });
+  const ne = $('pm_notes'); if(ne && ne.value) e.notes = ne.value;
+  const body = load('gl_body', []);
+  const ti = body.findIndex(x => x.date === todayStr);
+  if (ti >= 0) body[ti] = {...body[ti], ...e};
+  else body.push(e);
+  store('gl_body', body);
+  closeCycleModal();
+}
+
+// Cycle history for overview
+function getCycleHistory() {
+  const history = [];
+  for (let c = 1; c < aCycle; c++) {
+    const s = load('gl_cycle_'+c+'_summary', null);
+    if (s) history.push({ cycle: c, ...s });
+  }
+  return history;
+}
+// ════════════════════════════════════════════════════
+// GOOGLE SHEETS SYNC
+// ════════════════════════════════════════════════════
+
+const APPS_SCRIPT_CODE = `/**
+ * GluteLab → Google Sheets Sync
+ * APPEND + UPDATE ONLY — existing rows are never deleted.
+ * Google Sheets is the permanent archive. The app just adds to it.
+ *
+ * Setup:
+ *   1. Extensions > Apps Script > paste this > Save
+ *   2. Deploy > New deployment > Web app > Anyone > Deploy
+ *   3. Copy the Web App URL into GluteLab Settings > Sync tab
+ */
+
+// ── Unique key definitions per sheet ──────────────────────────
+// These columns together identify one unique row.
+// On sync: if the key already exists → UPDATE that row.
+//          if the key is new → APPEND a new row.
+// This means historical data is NEVER deleted.
+const KEY_COLS = {
+  'Workouts':   [0, 1, 2],   // Date + Exercise + Set#
+  'Body Stats': [0],          // Date
+  'Meals':      [0, 1],       // Date + Meal
+  'Steps':      [0],          // Date
+  'Cycles':     [0],          // Cycle number
+};
+
+function doPost(e) {
+  try {
+    const data = JSON.parse(e.postData.contents);
+    const ss = SpreadsheetApp.getActiveSpreadsheet();
+    let added = 0, updated = 0;
+
+    if (data.workouts && data.workouts.length > 0) {
+      const r = upsertSheet(ss, 'Workouts',
+        ['Date','Exercise','Set #','Weight (kg)','Reps','Difficulty','Week','Cycle','Synced At'],
+        data.workouts.map(r => [r.date, r.exercise, r.set, r.weight, r.reps, r.difficulty, r.week, r.cycle, r.syncedAt])
+      );
+      added += r.added; updated += r.updated;
+    }
+    if (data.body && data.body.length > 0) {
+      const r = upsertSheet(ss, 'Body Stats',
+        ['Date','Weight (kg)','Waist (cm)','Hips (cm)','Arms (cm)','Thighs (cm)','Notes','Cycle','Synced At'],
+        data.body.map(r => [r.date, r.weight||'', r.waist||'', r.hips||'', r.arms||'', r.thighs||'', r.notes||'', r.cycle||'', r.syncedAt])
+      );
+      added += r.added; updated += r.updated;
+    }
+    if (data.meals && data.meals.length > 0) {
+      const r = upsertSheet(ss, 'Meals',
+        ['Date','Meal','Food','Protein (g)','Carbs (g)','Fat (g)','Synced At'],
+        data.meals.map(r => [r.date, r.meal, r.food, r.protein, r.carbs, r.fat, r.syncedAt])
+      );
+      added += r.added; updated += r.updated;
+    }
+    if (data.steps && data.steps.length > 0) {
+      const r = upsertSheet(ss, 'Steps',
+        ['Date','Steps','Synced At'],
+        data.steps.map(r => [r.date, r.steps, r.syncedAt])
+      );
+      added += r.added; updated += r.updated;
+    }
+    if (data.cycles && data.cycles.length > 0) {
+      const r = upsertSheet(ss, 'Cycles',
+        ['Cycle','Completed Date','Sessions','Total Sets','Top Exercise','Top Weight (kg)','Synced At'],
+        data.cycles.map(r => [r.cycle, r.completedDate, r.sessions, r.totalSets, r.topEx, r.topWeight, r.syncedAt])
+      );
+      added += r.added; updated += r.updated;
+    }
+
+    return ContentService
+      .createTextOutput(JSON.stringify({ status:'ok', added, updated }))
+      .setMimeType(ContentService.MimeType.JSON);
+
+  } catch(err) {
+    return ContentService
+      .createTextOutput(JSON.stringify({ status:'error', message: err.toString() }))
+      .setMimeType(ContentService.MimeType.JSON);
+  }
+}
+
+/**
+ * Upsert rows into a sheet.
+ * - Creates sheet + styled header if it doesn't exist yet.
+ * - For each incoming row: if a row with the same key columns exists → update it.
+ *   Otherwise → append it. Never deletes anything.
+ */
+function upsertSheet(ss, name, headers, rows) {
+  let sheet = ss.getSheetByName(name);
+  const isNew = !sheet;
+  if (isNew) {
+    sheet = ss.insertSheet(name);
+    sheet.appendRow(headers);
+    styleHeader(sheet, headers.length);
+    sheet.setFrozenRows(1);
+  }
+
+  const keyCols = KEY_COLS[name] || [0];
+  const lastRow = sheet.getLastRow();
+
+  // Read all existing data (skip header row 1) into a map: keyStr → rowIndex
+  const existingKeys = {};
+  if (lastRow > 1) {
+    const existing = sheet.getRange(2, 1, lastRow - 1, headers.length).getValues();
+    existing.forEach((row, i) => {
+      const k = keyCols.map(c => String(row[c])).join('|');
+      existingKeys[k] = i + 2; // 1-based sheet row
+    });
+  }
+
+  let added = 0, updated = 0;
+  const toAppend = [];
+
+  rows.forEach(row => {
+    const k = keyCols.map(c => String(row[c])).join('|');
+    if (existingKeys[k] !== undefined) {
+      // UPDATE existing row in place
+      sheet.getRange(existingKeys[k], 1, 1, headers.length).setValues([row]);
+      updated++;
+    } else {
+      // APPEND — collect for batch write
+      toAppend.push(row);
+      added++;
+    }
+  });
+
+  // Batch append new rows
+  if (toAppend.length > 0) {
+    const startRow = sheet.getLastRow() + 1;
+    sheet.getRange(startRow, 1, toAppend.length, headers.length).setValues(toAppend);
+    for (let i = 1; i <= headers.length; i++) sheet.autoResizeColumn(i);
+  }
+
+  return { added, updated };
+}
+
+function styleHeader(sheet, numCols) {
+  const hr = sheet.getRange(1, 1, 1, numCols);
+  hr.setBackground('#17110A');
+  hr.setFontColor('#E2957F');
+  hr.setFontWeight('bold');
+}
+
+// Required — Apps Script web apps need a doGet handler
+function doGet(e) {
+  return ContentService
+    .createTextOutput(JSON.stringify({ status: 'ok', service: 'GluteLab Sync', mode: 'append-only' }))
+    .setMimeType(ContentService.MimeType.JSON);
+}`;
+
+function collectAllData() {
+  const workouts = [], steps = [], mealRows = [];
+  const syncedAt = new Date().toISOString().slice(0,19).replace('T',' ');
+  try {
+    for (let k in localStorage) {
+      if (k.startsWith('gl_sets_')) {
+        const parts = k.split('_');
+        const dateStr = parts[parts.length-1];
+        if (!/^\d{4}-\d{2}-\d{2}$/.test(dateStr)) continue;
+        const exSlugStr = parts.slice(2, parts.length-1).join('_');
+        const sets = load(k, []);
+        let exName = exSlugStr;
+        outer: for (const day of PLAN) {
+          for (let w=0; w<4; w++) {
+            const all = [];
+            try { all.push(...day.phases(w)); } catch(e){}
+            if (day.phasesHome) { try { all.push(...day.phasesHome(w)); } catch(e){} }
+            for (const ph of all) {
+              for (const ex of (ph.items||[])) {
+                if (slug(ex.name) === exSlugStr) { exName = ex.name; break outer; }
+              }
+            }
+          }
+        }
+        sets.forEach((s,i) => {
+          if (s.w || s.r || s.df) {
+            workouts.push({ date:dateStr, exercise:exName, set:i+1,
+              weight:s.w||'', reps:s.r||'', difficulty:s.df||'',
+              week:'W'+(aWeek+1), cycle:aCycle, syncedAt });
+          }
+        });
+      }
+      if (k.startsWith('gl_steps_')) {
+        const dateStr = k.replace('gl_steps_','');
+        if (/^\d{4}-\d{2}-\d{2}$/.test(dateStr)) {
+          const val = loadStr(k,'');
+          if (val) steps.push({ date:dateStr, steps:parseInt(val)||0, syncedAt });
+        }
+      }
+      if (k.startsWith('gl_meal_')) {
+        const rest = k.replace('gl_meal_','');
+        const datePart = rest.slice(-10);
+        const mealName = rest.slice(0, rest.length-11);
+        if (/^\d{4}-\d{2}-\d{2}$/.test(datePart)) {
+          const s = load(k, {});
+          if (s.food || s.p || s.c || s.f) {
+            mealRows.push({ date:datePart, meal:mealName,
+              food:s.food||'', protein:s.p||'', carbs:s.c||'', fat:s.f||'', syncedAt });
+          }
+        }
+      }
+    }
+  } catch(e) {}
+  const body = load('gl_body', []).map(r => ({...r, syncedAt}));
+  const cycles = [];
+  for (let c=1; c<aCycle; c++) {
+    const s = load('gl_cycle_'+c+'_summary', null);
+    if (s) cycles.push({ cycle:c, completedDate:s.completedDate||'',
+      sessions:s.sessions||0, totalSets:s.totalSets||0,
+      topEx:s.prs&&s.prs[0]?s.prs[0].name:'',
+      topWeight:s.prs&&s.prs[0]?s.prs[0].weight:'', syncedAt });
+  }
+  workouts.sort((a,b)=>a.date.localeCompare(b.date));
+  steps.sort((a,b)=>a.date.localeCompare(b.date));
+  mealRows.sort((a,b)=>a.date.localeCompare(b.date));
+  return { workouts, body, meals:mealRows, steps, cycles };
+}
+
+function renderSettings() {
+  const savedUrl = loadStr('gl_sheets_url','');
+  const lastSync = loadStr('gl_last_sync','');
+  const data = collectAllData();
+  $('settingssec').innerHTML = `
+    <div class="stg-section">
+      <div class="stg-section-title">Your Data at a Glance</div>
+      <div class="stg-card">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:7px">
+          ${[['Workout Sets',data.workouts.length,'var(--peach)'],
+             ['Body Logs',data.body.length,'var(--sage)'],
+             ['Meal Entries',data.meals.length,'var(--lav)'],
+             ['Step Days',data.steps.length,'var(--teal)'],
+          ].map(([l,n,c])=>`<div style="background:var(--bg);border-radius:9px;padding:11px;text-align:center">
+            <div style="font-family:'Cormorant Garamond',serif;font-size:26px;color:${c};line-height:1">${n}</div>
+            <div style="font-size:9px;color:var(--warm);text-transform:uppercase;letter-spacing:1px;margin-top:2px">${l}</div>
+          </div>`).join('')}
+        </div>
+      </div>
+    </div>
+
+    <div class="stg-section">
+      <div class="stg-section-title">Step 1 — Get the Apps Script Code</div>
+      <div class="stg-card">
+        <h3>📋 Copy this code</h3>
+        <p>This goes into your Google Sheet. It creates an endpoint that GluteLab can send data to.</p>
+        <div class="code-block">${esc(APPS_SCRIPT_CODE)}</div>
+        <button class="copy-btn" onclick="copyScript()">📋 Copy Apps Script code</button>
+        <div id="copynote" style="text-align:center;font-size:11px;color:var(--sage);margin-top:5px;min-height:14px;font-style:italic"></div>
+      </div>
+    </div>
+
+    <div class="stg-section">
+      <div class="stg-section-title">Step 2 — Set Up in Google Sheets</div>
+      <div class="stg-card">
+        <ol class="step-list">
+          <li>Open <strong>Google Sheets</strong> and create a new spreadsheet</li>
+          <li>Click <strong>Extensions → Apps Script</strong></li>
+          <li>Delete any existing code, paste the code you copied above</li>
+          <li>Click <strong>Save</strong> (Cmd/Ctrl+S)</li>
+          <li>Click <strong>Deploy → New deployment</strong></li>
+          <li>Click the ⚙️ gear icon → select <strong>Web app</strong></li>
+          <li>Set <strong>"Who has access"</strong> to <strong>Anyone</strong></li>
+          <li>Click <strong>Deploy</strong> and authorise when prompted</li>
+          <li>Copy the <strong>Web app URL</strong> — starts with https://script.google.com/macros/s/...</li>
+        </ol>
+      </div>
+    </div>
+
+    <div class="stg-section">
+      <div class="stg-section-title">Step 3 — Connect &amp; Sync</div>
+      <div class="stg-card">
+        <h3>🔗 Paste your Web App URL</h3>
+        <p>Saved on this device only. GluteLab never shares this with anyone.</p>
+        <input class="url-input" type="url" id="sheetsUrl"
+          placeholder="https://script.google.com/macros/s/..."
+          value="${esc(savedUrl)}"/>
+        <button class="sync-btn sync-btn-go" onclick="saveUrlAndSync()" id="syncBtn">
+          ${savedUrl ? '🔄 Sync Now' : '💾 Save &amp; Sync'}
+        </button>
+        <div class="sync-status" id="syncStatus">${lastSync ? '✅ Last synced: '+lastSync : 'Not synced yet'}</div>
+      </div>
+    </div>
+
+    <div class="stg-section">
+      <div class="stg-section-title">What Gets Synced</div>
+      <div class="stg-card">
+        ${[['🏋️ Workouts','Every set — date, exercise, weight, reps, difficulty, cycle. Key: Date + Exercise + Set #'],
+           ['📏 Body Stats','Weight and measurements over time. Key: Date'],
+           ['🥗 Meals','Food logs with protein, carbs, fat. Key: Date + Meal name'],
+           ['👟 Steps','Daily step counts. Key: Date'],
+           ['🔄 Cycles','Completed cycle summaries with PRs. Key: Cycle number'],
+        ].map(([t,d])=>`<div style="padding:8px 0;border-bottom:1px solid var(--border)">
+          <div style="font-size:12px;font-weight:700">${t}</div>
+          <div style="font-size:11px;color:var(--warm);margin-top:1px">${d}</div>
+        </div>`).join('')}
+        <div style="margin-top:10px;padding:9px;background:#17110A;border-radius:9px">
+          <p style="font-size:11px;color:#8BBAA8;line-height:1.6;margin:0">💡 <strong style="color:#E2957F">Append-only:</strong> rows are never deleted from Sheets. New sessions get appended. Corrected weights update the existing row. Your Sheet is the permanent archive — safe even if the app data is ever lost.</p>
+        </div>
+      </div>
+    </div>`;
+}
+
+function copyScript() {
+  const cb = () => {
+    $('copynote').textContent = '✅ Copied to clipboard!';
+    setTimeout(()=>{ const e=$('copynote'); if(e) e.textContent=''; }, 3000);
+  };
+  try {
+    navigator.clipboard.writeText(APPS_SCRIPT_CODE).then(cb).catch(fallback);
+  } catch(e) { fallback(); }
+  function fallback() {
+    const ta = document.createElement('textarea');
+    ta.value = APPS_SCRIPT_CODE;
+    ta.style.cssText = 'position:fixed;opacity:0;top:0;left:0';
+    document.body.appendChild(ta);
+    ta.focus(); ta.select();
+    try { document.execCommand('copy'); cb(); }
+    catch(e2) { $('copynote').textContent = 'Long-press the code block above to copy manually'; }
+    document.body.removeChild(ta);
+  }
+}
+
+function setSyncStatus(msg, type) {
+  const el = $('syncStatus');
+  if (!el) return;
+  el.className = 'sync-status sync-'+type;
+  el.textContent = msg;
+}
+
+function saveUrlAndSync() {
+  const urlEl = $('sheetsUrl');
+  if (!urlEl) return;
+  const url = urlEl.value.trim();
+  if (!url) { setSyncStatus('⚠️ Please paste your Apps Script URL first', 'err'); return; }
+  if (!url.startsWith('https://script.google.com')) {
+    setSyncStatus('⚠️ URL should start with https://script.google.com/...', 'err'); return;
+  }
+  store('gl_sheets_url', url);
+  syncToSheets(url);
+}
+
+async function syncToSheets(url) {
+  const btn = $('syncBtn');
+  if (btn) { btn.disabled = true; btn.textContent = '⏳ Syncing...'; }
+  setSyncStatus('Collecting data...', 'loading');
+  try {
+    const data = collectAllData();
+    const totalRows = data.workouts.length + data.body.length + data.meals.length + data.steps.length;
+    setSyncStatus('Sending '+totalRows+' rows to Google Sheets...', 'loading');
+    const response = await fetch(url, {
+      method: 'POST',
+      body: JSON.stringify(data),
+      headers: { 'Content-Type': 'text/plain' },
+    });
+    const result = await response.json().catch(() => ({status:'ok', added:0, updated:0}));
+    if (result.status === 'error') throw new Error(result.message);
+    const now = new Date().toLocaleString('en-GB',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'});
+    store('gl_last_sync', now);
+    const addedMsg = result.added > 0 ? result.added+' new rows added' : '';
+    const updatedMsg = result.updated > 0 ? result.updated+' rows updated' : '';
+    const summary = [addedMsg, updatedMsg].filter(Boolean).join(' · ') || 'Already up to date';
+    setSyncStatus('✅ Synced at '+now+' — '+summary, 'ok');
+    if (btn) { btn.disabled = false; btn.textContent = '🔄 Sync Again'; }
+  } catch(err) {
+    const isCors = err.message && (err.message.includes('fetch') || err.message.includes('network') || err.message.toLowerCase().includes('failed'));
+    setSyncStatus(isCors
+      ? '⚠️ Access error — in Apps Script go to Deploy → Manage deployments → Edit → set "Who has access" to Anyone → redeploy'
+      : '❌ '+err.message, 'err');
+    if (btn) { btn.disabled = false; btn.textContent = '🔄 Try Again'; }
+  }
+}
+
+// ════════════════════════════════════════════════════
+function makeChart(data, color, unit='') {
+  if (!data || data.length < 1) return `<div class="empty">No data yet — log sets to see your progress 📈</div>`;
+  const W=300, H=110, PT={t:12,r:8,b:26,l:36};
+  const iW=W-PT.l-PT.r, iH=H-PT.t-PT.b;
+  const ys = data.map(d=>d.y);
+  const mn=Math.min(...ys), mx=Math.max(...ys);
+  const rng = mx - mn || 1;
+  const px = (d,i) => PT.l + i*(iW/Math.max(data.length-1,1));
+  const py = v => PT.t + iH - ((v-mn)/rng)*iH;
+  const pts = data.map((d,i) => `${px(d,i)},${py(d.y)}`).join(' ');
+  const gid = 'g'+Math.random().toString(36).slice(2,7);
+  // X labels: first, last, maybe middle
+  const xl = data.length===1
+    ? [{i:0}]
+    : [0, Math.floor((data.length-1)/2), data.length-1].filter((v,i,a)=>a.indexOf(v)===i).map(i=>({i}));
+  return `<svg class="ch" viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg">
+    <defs><linearGradient id="${gid}" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="${color}" stop-opacity=".2"/>
+      <stop offset="100%" stop-color="${color}" stop-opacity="0"/>
+    </linearGradient></defs>
+    <polygon points="${pts} ${px(data[data.length-1],data.length-1)},${PT.t+iH} ${PT.l},${PT.t+iH}" fill="url(#${gid})"/>
+    <polyline points="${pts}" fill="none" stroke="${color}" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+    ${data.map((d,i)=>`<circle cx="${px(d,i)}" cy="${py(d.y)}" r="${data.length===1?5:3.5}" fill="${color}" stroke="white" stroke-width="1.5"/>`).join('')}
+    <text x="${PT.l-3}" y="${PT.t}" font-size="9" fill="#8A7A6A" text-anchor="end" dominant-baseline="hanging">${Math.round(mx)}${unit}</text>
+    <text x="${PT.l-3}" y="${PT.t+iH}" font-size="9" fill="#8A7A6A" text-anchor="end">${Math.round(mn)}${unit}</text>
+    ${xl.map(({i})=>`<text x="${px(data[i],i)}" y="${H-3}" font-size="8" fill="#8A7A6A" text-anchor="middle">${data[i].x.slice(5)}</text>`).join('')}
+    <text x="${px(data[data.length-1],data.length-1)}" y="${py(data[data.length-1].y)-9}" font-size="11" fill="${color}" text-anchor="middle" font-weight="700">${data[data.length-1].y}${unit}</text>
+  </svg>`;
+}
+
+// ════════════════════════════════════════════════════
+// PROGRESS
+// ════════════════════════════════════════════════════
+function showPTab(btn) {
+  activePTab = btn.dataset.tab;
+  document.querySelectorAll('.ptb').forEach(b => b.classList.remove('on'));
+  btn.classList.add('on');
+  document.querySelectorAll('.psec').forEach(s => s.classList.remove('on'));
+  $('pt-'+activePTab).classList.add('on');
+  renderPTab(activePTab);
+}
+function renderPTab(t) {
+  if (t==='exercises') renderExercisesTab();
+  if (t==='body') renderBodyTab();
+  if (t==='overview') renderOverviewTab();
+  if (t==='export') renderExportTab();
+}
+
+// All logged exercises from localStorage
+function getAllLoggedEx() {
+  const seen = new Set();
+  const results = [];
+  try {
+    for (let k in localStorage) {
+      if (!k.startsWith('gl_sets_')) continue;
+      const parts = k.split('_');
+      if (parts.length < 4) continue;
+      const dateStr = parts[parts.length-1];
+      if (!/^\d{4}-\d{2}-\d{2}$/.test(dateStr)) continue;
+      const sl = parts.slice(2, parts.length-1).join('_');
+      if (seen.has(sl)) continue;
+      // Find exercise name from PLAN
+      let foundName = null;
+      outer: for (const day of PLAN) {
+        for (let w=0; w<4; w++) {
+          const phaseSets = [];
+          try { phaseSets.push(...day.phases(w)); } catch(e){}
+          if (day.phasesHome) { try { phaseSets.push(...day.phasesHome(w)); } catch(e){} }
+          for (const ph of phaseSets) {
+            for (const ex of ph.items) {
+              if (slug(ex.name) === sl) { foundName = ex.name; break outer; }
+            }
+          }
+        }
+      }
+      if (!foundName) continue;
+      seen.add(sl);
+      const hist = getHistory(foundName);
+      if (hist.length > 0) {
+        results.push({ name: foundName, sessions: hist.length, latest: hist[hist.length-1], hist });
+      }
+    }
+  } catch(e) {}
+  return results.sort((a,b) => b.sessions - a.sessions);
+}
+
+function renderExercisesTab() {
+  const el = $('pt-exercises');
+  if (selEx) {
+    const hist = getHistory(selEx);
+    const wData = hist.filter(h=>h.maxW>0).map(h=>({x:h.date,y:h.maxW}));
+    const vData = hist.filter(h=>h.vol>0).map(h=>({x:h.date,y:Math.round(h.vol)}));
+    const lastSets = hist.length > 0 ? hist[hist.length-1].sets : [];
+    const diffColor = {easy:'var(--easy)',hard:'var(--hard)',fail:'var(--fail)','':"var(--sand)"};
+    const diffLabel = {easy:'😌 Easy',hard:'😤 Hard',fail:'💀 Failure','':"—"};
+    el.innerHTML = `<button class="backbtn" onclick="selEx=null;renderExercisesTab()">← All exercises</button>
+      <div class="ccrd">
+        <div class="ct">${esc(selEx)}</div>
+        <div class="cs">${hist.length} session${hist.length!==1?'s':''} logged</div>
+        <div style="font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--warm);margin-bottom:7px">Max Weight Per Session</div>
+        ${makeChart(wData.length?wData:[{x:todayStr,y:0}],'#E2957F','kg')}
+        ${vData.length>1?`<div style="font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--warm);margin:12px 0 7px">Volume Per Session (kg × reps)</div>${makeChart(vData,'#A89BC0','')}`:''}
+        <div style="font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--warm);margin:12px 0 7px">Last Session Sets</div>
+        ${lastSets.map((s,i)=>`<div class="sethrow">
+          <span style="font-size:12px;color:var(--warm)">Set ${i+1}</span>
+          <span style="font-weight:700;font-size:13px">${s.w?s.w+'kg':'—'} × ${s.r?s.r+' reps':'—'}</span>
+          <span style="font-size:10px;color:${diffColor[s.df||'']};font-weight:700">${diffLabel[s.df||'']}</span>
+        </div>`).join('') || '<div style="color:var(--warm);font-size:12px;padding:8px 0">No sets recorded</div>'}
+      </div>`;
+    return;
+  }
+  const exs = getAllLoggedEx();
+  if (exs.length === 0) {
+    el.innerHTML = `<div class="empty">Log your first workout and it will appear here for tracking 💪</div>`;
+    return;
+  }
+  el.innerHTML = `<input class="exsearch" placeholder="🔍 Search exercises..." oninput="filterEx(this.value)" id="exsearchinp"/>
+    <div id="exlist">${renderExList(exs)}</div>`;
+}
+function renderExList(exs) {
+  return exs.map(ex => `<div class="exitem" onclick="selEx=${JSON.stringify(ex.name)};renderExercisesTab()">
+    <div class="exitem-n">${esc(ex.name)}</div>
+    <div class="exitem-s">${ex.sessions} session${ex.sessions!==1?'s':''} · last: ${ex.latest.date.slice(5)} · max ${ex.latest.maxW||0}kg</div>
+  </div>`).join('');
+}
+function filterEx(q) {
+  const exs = getAllLoggedEx().filter(e => e.name.toLowerCase().includes(q.toLowerCase()));
+  const el = $('exlist');
+  if (el) el.innerHTML = renderExList(exs);
+}
+
+// BODY STATS
+const BSTATS = [
+  {k:'weight',l:'Weight',u:'kg',c:'#E2957F'},
+  {k:'waist', l:'Waist', u:'cm',c:'#A89BC0'},
+  {k:'hips',  l:'Hips',  u:'cm',c:'#8BBAA8'},
+  {k:'arms',  l:'Arms',  u:'cm',c:'#7BB5C8'},
+  {k:'thighs',l:'Thighs',u:'cm',c:'#C9A96E'},
+];
+function renderBodyTab() {
+  const body = load('gl_body', []);
+  const lat = body.length > 0 ? body[body.length-1] : {};
+  const first = body.length > 0 ? body[0] : {};
+  const bs = BSTATS.find(s=>s.k===selBodyStat) || BSTATS[0];
+  const chartData = body.filter(e=>e[bs.k]).map(e=>({x:e.date, y:parseFloat(e[bs.k])}));
+  const diff = first[bs.k] && lat[bs.k]
+    ? (parseFloat(lat[bs.k]) - parseFloat(first[bs.k])).toFixed(1)
+    : null;
+  const goodDir = (bs.k==='weight'||bs.k==='waist') ? diff<0 : diff>0;
+  $('pt-body').innerHTML = `
+    <div class="spills">
+      ${BSTATS.map(s=>`<button class="spill${s.k===selBodyStat?' on':''}" onclick="selBodyStat='${s.k}';renderBodyTab()">${s.l}</button>`).join('')}
+    </div>
+    <div class="ccrd">
+      <div class="ct">${bs.l} Over Time</div>
+      <div class="cs">${body.length} measurement${body.length!==1?'s':''} logged</div>
+      ${makeChart(chartData.length?chartData:[{x:todayStr,y:0}], bs.c, bs.u)}
+      ${diff !== null ? `<div style="display:flex;justify-content:space-between;margin-top:12px;padding:10px;background:var(--bg);border-radius:9px">
+        <div style="text-align:center"><div style="font-size:9px;color:var(--warm)">Start</div><div style="font-weight:700">${first[bs.k]}${bs.u}</div></div>
+        <div style="text-align:center"><div style="font-size:9px;color:var(--warm)">Change</div><div style="font-weight:700;font-size:17px;color:${goodDir?'var(--sage)':'var(--peach)'}">${diff>0?'+':''}${diff}${bs.u}</div></div>
+        <div style="text-align:center"><div style="font-size:9px;color:var(--warm)">Now</div><div style="font-weight:700">${lat[bs.k]}${bs.u}</div></div>
+      </div>` : ''}
+    </div>
+    <div class="bmc">
+      <div style="font-size:10px;font-weight:700;margin-bottom:10px">Log Today's Measurements</div>
+      ${BSTATS.map(s=>`<div class="brow"><span class="blbl">${s.l} ${s.u}</span>
+        <input class="binp" type="number" placeholder="${s.u}" id="binp_${s.k}" value="${lat[s.k]||''}"/></div>`).join('')}
+      <textarea class="mta" id="binp_notes" placeholder="Notes, energy levels, how you felt..." style="margin:5px 0">${lat.notes||''}</textarea>
+      <button class="savebtn" onclick="saveBody()">Save Measurements</button>
+      <div id="bodynote" style="text-align:center;font-size:11px;color:var(--sage);margin-top:5px;font-style:italic"></div>
+    </div>`;
+}
+function saveBody() {
+  const e = { date: todayStr };
+  BSTATS.forEach(s => { const el = $('binp_'+s.k); if(el) e[s.k] = el.value; });
+  const ne = $('binp_notes'); if(ne) e.notes = ne.value;
+  const body = load('gl_body', []);
+  const ti = body.findIndex(x => x.date === todayStr);
+  if (ti >= 0) body[ti] = e; else body.push(e);
+  store('gl_body', body);
+  const n = $('bodynote'); if(n) n.textContent = '✅ Saved!';
+  setTimeout(renderBodyTab, 700);
+}
+
+function renderOverviewTab() {
+  const sd = load('gl_streak', {count:0, last:'', days:[]});
+  const body = load('gl_body', []);
+  const lat = body.length > 0 ? body[body.length-1] : {};
+  const dl = ['Su','Mo','Tu','We','Th','Fr','Sa'];
+  const exs = getAllLoggedEx();
+  const cycleHistory = getCycleHistory();
+  $('pt-overview').innerHTML = `
+    <div class="strcrd">
+      <div style="font-size:9px;letter-spacing:3px;color:var(--peach);text-transform:uppercase;margin-bottom:5px">Workout Streak</div>
+      <div class="strn">${sd.count}</div>
+      <div style="font-size:10px;color:#5A4A3A;letter-spacing:2px;text-transform:uppercase;margin-top:3px">days in a row 🔥</div>
+      <div class="wdots">${dl.map((l,i)=>`<div class="wdot${sd.days?.includes(i)?' on':''}">${l}</div>`).join('')}</div>
+    </div>
+    <div class="sgrid">
+      <div class="scrd"><div class="sn" style="color:var(--peach)">${sd.count||0}</div><div class="sl">Streak</div></div>
+      <div class="scrd"><div class="sn" style="color:var(--gold)">C${aCycle}</div><div class="sl">Current Cycle</div></div>
+      <div class="scrd"><div class="sn" style="color:var(--lav)">${lat.weight?lat.weight+'kg':'—'}</div><div class="sl">Weight</div></div>
+      <div class="scrd"><div class="sn" style="color:var(--sand)">${lat.hips?lat.hips+'cm':'—'}</div><div class="sl">Hips</div></div>
+    </div>
+    ${exs.length>0?`<div class="ccrd">
+      <div class="ct">Current Cycle PRs 🏆</div>
+      ${exs.slice(0,6).map(ex=>`<div class="sethrow">
+        <span style="font-size:12px;font-weight:700">${esc(ex.name)}</span>
+        <span style="font-size:13px;color:var(--peach);font-weight:700">${ex.latest.maxW>0?ex.latest.maxW+'kg':'—'}</span>
+      </div>`).join('')}
+    </div>`:'<div class="empty">Start logging sets to see your PRs here 💪</div>'}
+    ${cycleHistory.length > 0 ? `<div class="ccrd">
+      <div class="ct">Cycle History 📅</div>
+      <div class="cs">${cycleHistory.length} cycle${cycleHistory.length!==1?'s':''} completed</div>
+      ${cycleHistory.map(c=>`
+        <div style="padding:10px 0;border-bottom:1px solid var(--border)">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">
+            <span style="font-weight:700;font-size:13px">Cycle ${c.cycle}</span>
+            <span style="font-size:10px;color:var(--warm)">${c.completedDate}</span>
+          </div>
+          <div style="display:flex;gap:12px">
+            <span style="font-size:11px;color:var(--warm)">${c.sessions} sessions</span>
+            <span style="font-size:11px;color:var(--warm)">${c.totalSets} sets</span>
+            <span style="font-size:11px;color:var(--sage)">${c.prs?c.prs.length:0} PRs</span>
+          </div>
+          ${c.prs&&c.prs.length>0?`<div style="margin-top:5px;font-size:11px;color:var(--lav);font-style:italic">Best: ${c.prs.slice(0,2).map(p=>p.name+' '+p.weight+'kg').join(' · ')}</div>`:''}
+        </div>`).join('')}
+    </div>` : `<div class="ccrd" style="background:var(--dark)">
+      <div style="font-size:10px;letter-spacing:2px;color:var(--peach);text-transform:uppercase;margin-bottom:6px">Next Milestone</div>
+      <p style="font-size:12px;color:#6A5A4A;line-height:1.6">Complete Week 4 to finish your first cycle. Your weights, sets, and body stats will be saved as your Cycle 1 baseline — then Cycle 2 starts with those numbers as targets to beat.</p>
+    </div>`}
+    <div style="margin-bottom:10px">
+      <button class="modal-btn modal-btn-secondary" style="margin-top:0" onclick="showCycleCompleteModal()">👀 Preview cycle summary</button>
+    </div>`;
+}
+
+// ════════════════════════════════════════════════════
+// EXPORT SYSTEM
+// ════════════════════════════════════════════════════
+
+// Build full export payload from localStorage
+function buildExportPayload() {
+  const payload = {
+    exportDate: todayStr,
+    appVersion: 'GluteLab v5',
+    cycle: aCycle,
+
+    // ── Body stats ──────────────────────────────────
+    bodyStats: load('gl_body', []),
+
+    // ── Workout set logs ────────────────────────────
+    workoutLogs: [],
+
+    // ── Meal logs (last 30 days) ─────────────────────
+    mealLogs: [],
+
+    // ── Cycle summaries ─────────────────────────────
+    cycleSummaries: [],
+  };
+
+  // Collect all set logs
+  try {
+    for (let k in localStorage) {
+      if (!k.startsWith('gl_sets_')) continue;
+      const parts = k.split('_');
+      const dateStr = parts[parts.length-1];
+      if (!/^\d{4}-\d{2}-\d{2}$/.test(dateStr)) continue;
+      const sl = parts.slice(2, parts.length-1).join('_');
+      // Find exercise name
+      let exName = sl;
+      outer: for (const day of PLAN) {
+        for (let w=0; w<4; w++) {
+          const all = [];
+          try { all.push(...day.phases(w)); } catch(e){}
+          if (day.phasesHome) { try { all.push(...day.phasesHome(w)); } catch(e){} }
+          for (const ph of all) {
+            for (const ex of (ph.items||[])) {
+              if (slug(ex.name) === sl) { exName = ex.name; break outer; }
+            }
+          }
+        }
+      }
+      const sets = load(k, []);
+      sets.forEach((s, si) => {
+        if (!s.w && !s.r && !s.df) return;
+        payload.workoutLogs.push({
+          date: dateStr,
+          exercise: exName,
+          set: si + 1,
+          weightKg: parseFloat(s.w) || '',
+          reps: parseInt(s.r) || '',
+          difficulty: s.df || '',
+          volumeKg: (parseFloat(s.w)||0) * (parseInt(s.r)||0) || '',
+        });
+      });
+    }
+  } catch(e) {}
+
+  // Meal logs — last 60 days
+  try {
+    const cutoff = new Date(today);
+    cutoff.setDate(cutoff.getDate() - 60);
+    for (let k in localStorage) {
+      if (!k.startsWith('gl_meal_')) continue;
+      const parts = k.split('_');
+      const mealName = parts[2];
+      const dateStr = parts[3];
+      if (!dateStr || !/^\d{4}-\d{2}-\d{2}$/.test(dateStr)) continue;
+      if (dateStr < cutoff.toISOString().split('T')[0]) continue;
+      const m = load(k, {});
+      if (!m.food && !m.p && !m.c && !m.f) continue;
+      payload.mealLogs.push({
+        date: dateStr,
+        meal: mealName,
+        food: m.food || '',
+        proteinG: parseFloat(m.p) || '',
+        carbsG: parseFloat(m.c) || '',
+        fatG: parseFloat(m.f) || '',
+        kcal: Math.round((parseFloat(m.p)||0)*4 + (parseFloat(m.c)||0)*4 + (parseFloat(m.f)||0)*9) || '',
+      });
+    }
+  } catch(e) {}
+
+  // Cycle summaries
+  for (let c = 1; c <= aCycle; c++) {
+    const s = load('gl_cycle_'+c+'_summary', null);
+    if (s) payload.cycleSummaries.push({ cycle: c, ...s });
+  }
+
+  // Sort logs by date
+  payload.workoutLogs.sort((a,b) => a.date.localeCompare(b.date) || a.exercise.localeCompare(b.exercise) || a.set - b.set);
+  payload.mealLogs.sort((a,b) => a.date.localeCompare(b.date));
+
+  return payload;
+}
+
+// Export to Google Sheets via Apps Script URL
+async function exportToSheets() {
+  const url = loadStr('gl_sheets_url', '').trim();
+  if (!url) {
+    showExportStatus('err', '⚠️ Paste your Apps Script URL first');
+    return;
+  }
+  if (!url.startsWith('https://script.google.com/macros/s/')) {
+    showExportStatus('err', '⚠️ URL should start with https://script.google.com/macros/s/');
+    return;
+  }
+  showExportStatus('loading', '⏳ Sending to Google Sheets…');
+  try {
+    const payload = buildExportPayload();
+    // Use no-cors mode + encode as URL params to work around CORS on Apps Script
+    const formData = new FormData();
+    formData.append('data', JSON.stringify(payload));
+    const res = await fetch(url, {
+      method: 'POST',
+      body: formData,
+      mode: 'no-cors', // Apps Script doesn't return CORS headers on redirect
+    });
+    // no-cors means we can't read the response — assume success if no throw
+    store('gl_last_export', todayStr);
+    showExportStatus('ok', '✅ Sent! Check your Google Sheet — data should appear within a few seconds.');
+    renderExportTab(); // refresh last export date
+  } catch(e) {
+    showExportStatus('err', '❌ Failed: ' + e.message + '. Check your URL and internet connection.');
+  }
+}
+
+function showExportStatus(type, msg) {
+  const el = $('exp-status');
+  if (!el) return;
+  el.className = 'exp-status ' + type;
+  el.textContent = msg;
+}
+
+// CSV download fallback
+function downloadCSV() {
+  const payload = buildExportPayload();
+  let csv = '';
+
+  // Sheet 1: Workout Logs
+  csv += 'WORKOUT LOGS\n';
+  csv += 'Date,Exercise,Set,Weight (kg),Reps,Difficulty,Volume (kg×reps)\n';
+  payload.workoutLogs.forEach(r => {
+    csv += `${r.date},"${r.exercise}",${r.set},${r.weightKg},${r.reps},${r.difficulty},${r.volumeKg}\n`;
+  });
+
+  csv += '\nBODY STATS\n';
+  csv += 'Date,Weight (kg),Waist (cm),Hips (cm),Arms (cm),Thighs (cm),Notes\n';
+  payload.bodyStats.forEach(r => {
+    csv += `${r.date},${r.weight||''},${r.waist||''},${r.hips||''},${r.arms||''},${r.thighs||''},"${(r.notes||'').replace(/"/g,"'")}"\n`;
+  });
+
+  csv += '\nMEAL LOGS (last 60 days)\n';
+  csv += 'Date,Meal,Food,Protein (g),Carbs (g),Fat (g),Kcal\n';
+  payload.mealLogs.forEach(r => {
+    csv += `${r.date},${r.meal},"${(r.food||'').replace(/"/g,"'")}",${r.proteinG},${r.carbsG},${r.fatG},${r.kcal}\n`;
+  });
+
+  const blob = new Blob([csv], {type:'text/csv;charset=utf-8;'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = `glutelab_export_${todayStr}.csv`;
+  document.body.appendChild(a); a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+
+// Render the export tab
+function renderExportTab() {
+  const savedUrl = loadStr('gl_sheets_url', '');
+  const lastExport = loadStr('gl_last_export', '');
+  const stats = buildExportPayload();
+
+  $('pt-export').innerHTML = `
+    <div class="exp-step">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">
+        <div class="exp-step-num">1</div>
+        <div class="exp-step-title">Create your Google Sheet connection</div>
+      </div>
+      <div class="exp-step-body">
+        Open <strong>script.google.com</strong> → New project → paste the code below → click Deploy → New deployment → Web app → Execute as: <em>Me</em> → Who has access: <em>Anyone</em> → Deploy → copy the URL.
+      </div>
+      <div class="code-block">function doPost(e) {
+  try {
+    const data = JSON.parse(e.parameter.data);
+    const ss = SpreadsheetApp.getActiveSpreadsheet()
+      || SpreadsheetApp.create('GluteLab Data');
+
+    writeSheet(ss, 'Workouts', 
+      ['Date','Exercise','Set','Weight(kg)','Reps','Difficulty','Volume'],
+      data.workoutLogs.map(r=>[r.date,r.exercise,r.set,
+        r.weightKg,r.reps,r.difficulty,r.volumeKg]));
+
+    writeSheet(ss, 'Body Stats',
+      ['Date','Weight(kg)','Waist(cm)','Hips(cm)','Arms(cm)','Thighs(cm)','Notes'],
+      data.bodyStats.map(r=>[r.date,r.weight,r.waist,
+        r.hips,r.arms,r.thighs,r.notes||'']));
+
+    writeSheet(ss, 'Meals',
+      ['Date','Meal','Food','Protein(g)','Carbs(g)','Fat(g)','Kcal'],
+      data.mealLogs.map(r=>[r.date,r.meal,r.food,
+        r.proteinG,r.carbsG,r.fatG,r.kcal]));
+
+    writeSheet(ss, 'Cycles',
+      ['Cycle','Completed','Sessions','Sets','Top PR'],
+      data.cycleSummaries.map(r=>[r.cycle,r.completedDate,
+        r.sessions,r.totalSets,
+        r.prs&&r.prs[0]?r.prs[0].name+' '+r.prs[0].weight+'kg':'']));
+
+    return ContentService
+      .createTextOutput(JSON.stringify({ok:true}))
+      .setMimeType(ContentService.MimeType.JSON);
+  } catch(err) {
+    return ContentService
+      .createTextOutput(JSON.stringify({ok:false,error:err.message}))
+      .setMimeType(ContentService.MimeType.JSON);
+  }
+}
+
+function writeSheet(ss, name, headers, rows) {
+  let sheet = ss.getSheetByName(name);
+  if (!sheet) sheet = ss.insertSheet(name);
+  sheet.clearContents();
+  sheet.getRange(1,1,1,headers.length).setValues([headers]);
+  if (rows.length > 0)
+    sheet.getRange(2,1,rows.length,headers.length).setValues(rows);
+}</div>
+    </div>
+
+    <div class="exp-step">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">
+        <div class="exp-step-num">2</div>
+        <div class="exp-step-title">Paste your deployment URL</div>
+      </div>
+      <input class="exp-url-input" type="url" placeholder="https://script.google.com/macros/s/AKfyc…/exec"
+        value="${esc(savedUrl)}" oninput="store('gl_sheets_url', this.value)" onchange="store('gl_sheets_url', this.value)"/>
+      <div style="font-size:10px;color:var(--warm);margin-top:4px">This URL is saved locally on your device only — never sent anywhere except Google.</div>
+    </div>
+
+    <div class="exp-step">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">
+        <div class="exp-step-num">3</div>
+        <div class="exp-step-title">Export your data</div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:7px;margin-bottom:8px;text-align:center">
+        <div style="background:var(--bg);border-radius:9px;padding:10px 6px">
+          <div style="font-family:'Cormorant Garamond',serif;font-size:22px;color:var(--peach)">${stats.workoutLogs.length}</div>
+          <div style="font-size:9px;color:var(--warm);text-transform:uppercase;letter-spacing:.5px">Sets logged</div>
+        </div>
+        <div style="background:var(--bg);border-radius:9px;padding:10px 6px">
+          <div style="font-family:'Cormorant Garamond',serif;font-size:22px;color:var(--sage)">${stats.bodyStats.length}</div>
+          <div style="font-size:9px;color:var(--warm);text-transform:uppercase;letter-spacing:.5px">Body logs</div>
+        </div>
+        <div style="background:var(--bg);border-radius:9px;padding:10px 6px">
+          <div style="font-family:'Cormorant Garamond',serif;font-size:22px;color:var(--lav)">${stats.mealLogs.length}</div>
+          <div style="font-size:9px;color:var(--warm);text-transform:uppercase;letter-spacing:.5px">Meal logs</div>
+        </div>
+      </div>
+      ${lastExport ? `<div style="font-size:10px;color:var(--sage);text-align:center;margin-bottom:6px">Last exported: ${lastExport}</div>` : ''}
+      <div id="exp-status" class="exp-status"></div>
+      <button class="exp-btn exp-btn-go" onclick="exportToSheets()">☁️ Export to Google Sheets</button>
+      <button class="exp-btn exp-btn-csv" onclick="downloadCSV()">⬇️ Download as CSV (backup)</button>
+    </div>
+
+    <div class="exp-step">
+      <div class="exp-step-title" style="margin-bottom:6px">📋 What gets exported</div>
+      <div class="exp-step-body">
+        <strong>Workouts tab</strong> — every set you've ever logged: date, exercise, weight, reps, difficulty, volume<br><br>
+        <strong>Body Stats tab</strong> — all your measurements over time<br><br>
+        <strong>Meals tab</strong> — last 60 days of food and macro logs<br><br>
+        <strong>Cycles tab</strong> — summary of each completed cycle<br><br>
+        Each export <em>overwrites</em> the sheet with fresh complete data — so just export whenever you want an up-to-date backup. No duplicates.
+      </div>
+    </div>`;
+}
+
+// ════════════════════════════════════════════════════
+// INIT
+// ════════════════════════════════════════════════════
+try {
+  renderWeekBar();
+  renderDayPills();
+  renderModeToggle();
+  renderDay();
+} catch(e) {
+  console.error('Init error:', e);
+  $('esec').innerHTML = `<div style="padding:20px;color:#E2957F;font-size:13px">
+    Error loading workout. Please refresh. (${esc(e.message)})
+  </div>`;
+}
+</script>
+</body>
+</html>
